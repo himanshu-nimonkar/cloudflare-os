@@ -19,9 +19,10 @@ import { LanguageModelGatekeeper } from "./ai-models";
 import { getAiGatewayConfig } from "./ai-gateway.js";
 import { AdminSettings, AdminApiImpl } from "./admin-settings.js";
 import { BlueprintKvRecord, buildBlueprintArchiveStream, sanitizeBlueprintOutput, listFeaturedBlueprintsFromKv, parseBlueprintArchive, randomBlueprintId, readBlueprintContent, readBlueprintKvRecord } from "./blueprint-archive.js";
-import { GatekeeperConnectCallbackImpl, normalizeUsername, UserDurableObject, CLOUDFLARE_VENDOR_ID } from "./user";
+import { GatekeeperConnectCallbackImpl, normalizeUsername, UserDurableObject, CLOUDFLARE_VENDOR_ID, ProvidedAccountInfo } from "./user";
 import { OverseerDurableObject, GatekeeperLoopback, CodeModeTailLoopback, AgentSpawnerGatekeeper, GatekeeperHookLoopback, GadgetTailLoopback, AgentSelfLoopback } from "./overseer";
 import { UserDirectoryDurableObject } from "./user-directory.js";
+import { GatekeeperUserProfileImpl } from "./gatekeeper-user-profile.js";
 import { ExternalMessageGateway } from "./external-message-gateway";
 import { RpcStub as NativeRpcStub } from "cloudflare:workers";
 import { recordAnalytics } from "./analytics";
@@ -56,6 +57,9 @@ export { AdminSettings };
 
 // Re-export the deployment-wide user directory Durable Object.
 export { UserDirectoryDurableObject };
+
+// Re-export the Workshop-owned profile entrypoint so it can cross native Worker RPC.
+export { GatekeeperUserProfileImpl };
 
 // Re-export entrypoint types from user.ts.
 export { UserDurableObject, GatekeeperConnectCallbackImpl };
@@ -603,15 +607,28 @@ class AuthenticatedApiImpl extends RpcTarget implements AuthenticatedApi {
         }));
   }
 
-  async getGatekeeperApp(id: string): Promise<GatekeeperUiFrame | null> {
-    // Self-sufficient: listProvidedAccounts provisions auto-provisioned accounts first (idempotent),
-    // so a direct URL load of /gatekeepers/$id works without racing the Header's listGatekeeperApps.
-    let user = this.#user;  // one stub for both calls
+  // The user's UI-providing account for a gatekeeper id. Self-sufficient: listProvidedAccounts
+  // provisions auto-provisioned accounts first (idempotent), so a direct URL load of /gatekeepers/$id
+  // works without racing the Header's listGatekeeperApps.
+  async #uiAccount(user: DurableObjectStub<UserDurableObject>, id: string)
+      : Promise<ProvidedAccountInfo | undefined> {
     let accounts = await user.listProvidedAccounts();
-    let app = accounts.find((account: (typeof accounts)[number]) => account.vendorId === id && account.description.providesUi);
+    return accounts.find(account => account.vendorId === id && account.description.providesUi);
+  }
+
+  async getGatekeeperApp(id: string): Promise<GatekeeperUiFrame | null> {
+    let user = this.#user;  // one stub for both calls
+    let app = await this.#uiAccount(user, id);
     if (!app) return null;
     // isAdmin is supplied fresh per open so admin-gated features reflect the user's current status.
     return user.startAccountAppUi(app.accountId, { isAdmin: this.#isAdmin() });
+  }
+
+  async pickGatekeeperUser(gatekeeperId: string, target: string, userId: string): Promise<boolean> {
+    let user = this.#user;
+    let app = await this.#uiAccount(user, gatekeeperId);
+    if (!app) throw new Error("No such app.");
+    return user.deliverPickedUser(app.accountId, target, userId);
   }
 
   // --- Deployment admin ---
