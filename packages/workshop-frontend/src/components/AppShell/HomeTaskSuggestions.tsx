@@ -87,7 +87,7 @@ function SuggestionRow({
             {icon}
           </span>
         }
-        className="!w-full !justify-start gap-3 !px-2 !py-2 text-left"
+        className="group !w-full !justify-start gap-3 !px-2 !py-2 text-left"
       >
         <span className="min-w-0 flex-1">
           <span className="block truncate text-[13px] leading-[18px] font-medium tracking-[-0.25px] text-kumo-default">
