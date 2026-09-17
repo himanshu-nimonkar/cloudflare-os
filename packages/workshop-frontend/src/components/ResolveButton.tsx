@@ -13,7 +13,7 @@ export function ResolveButton({
   onClick: MouseEventHandler<HTMLButtonElement>
 }) {
   const toneClassName = variant === 'filled'
-    ? '!h-7'
+    ? '!h-7 !bg-kumo-brand enabled:hover:!opacity-90'
     // Kumo's ghost variant has no disabled guard on its own hover:bg-kumo-tint, so a disabled
     // button still shows hover feedback unless it's explicitly suppressed here too.
     : tone === 'approve'
