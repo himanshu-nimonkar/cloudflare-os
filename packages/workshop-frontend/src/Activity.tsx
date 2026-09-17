@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState, type ReactNode } from 'react'
-import { Switch, useKumoToastManager } from '@cloudflare/kumo'
+import { Button, Collapsible, Switch, Tabs, useKumoToastManager } from '@cloudflare/kumo'
 import { CaretRight, Check, Eye, Lightning, ShieldCheck } from '@phosphor-icons/react'
 import { RpcStub } from 'capnweb'
 import { ActionLogEntry, Overseer, actionChangeTime } from '@gadgets/workshop-shared/api'
@@ -382,13 +382,14 @@ export default function Activity({
 
     return (
       <ActivityNotice title="No matching events">
-        <button
-          type="button"
+        <Button
+          variant="ghost"
+          size="xs"
           onClick={() => setHistoryFilter('all')}
-          className="mt-1.5 cursor-pointer text-[12px] font-medium text-kumo-subtle hover:text-kumo-default"
+          className="mt-1.5 !px-0 !text-kumo-subtle hover:!text-kumo-default"
         >
           Show all activity
-        </button>
+        </Button>
       </ActivityNotice>
     )
   }
@@ -401,20 +402,13 @@ export default function Activity({
         return (
           <>
             <div className={`${PANE_BAR} gap-1 px-3`}>
-              {HISTORY_FILTERS.map(filter => (
-                <button
-                  key={filter.value}
-                  type="button"
-                  onClick={() => setHistoryFilter(filter.value)}
-                  className={`flex h-6 cursor-pointer items-center rounded-md px-2 text-[12.5px] font-medium tracking-[-0.15px] transition-colors ${
-                    historyFilter === filter.value
-                      ? 'bg-kumo-tint text-kumo-default'
-                      : 'text-kumo-subtle hover:text-kumo-default'
-                  }`}
-                >
-                  {filter.label}
-                </button>
-              ))}
+              <Tabs
+                variant="segmented"
+                size="sm"
+                value={historyFilter}
+                onValueChange={(value) => setHistoryFilter(value as HistoryViewFilter)}
+                tabs={HISTORY_FILTERS.map(filter => ({ value: filter.value, label: filter.label }))}
+              />
               <span className="ml-auto pr-2 text-[11.5px] leading-[17px] tabular-nums text-kumo-inactive">
                 {history.entries.length} loaded
               </span>
@@ -530,13 +524,14 @@ function AutoApprovalPanel({
             : 'Actions agents may take without asking. Everything else waits for your review.'}
         </p>
         {loadError && (
-          <button
-            type="button"
+          <Button
+            variant="ghost"
+            size="xs"
             onClick={() => void refresh()}
-            className="cursor-pointer text-[12px] font-medium text-kumo-default hover:text-kumo-default-hover"
+            className="!px-0 !text-kumo-default hover:!text-kumo-default-hover"
           >
             Retry
-          </button>
+          </Button>
         )}
       </div>
       <div className="min-h-0 flex-1 overflow-auto">
@@ -613,11 +608,11 @@ function ReviewRequest({
     <article className="border-b border-kumo-line px-5 py-3 transition-colors hover:bg-kumo-elevated/50">
       <div className="flex flex-wrap items-start gap-x-3 gap-y-1.5">
         <div className="min-w-[8rem] flex-1">
-          <button
-            type="button"
+          <Button
+            variant="ghost"
             onClick={onToggle}
             aria-expanded={expanded}
-            className="flex max-w-full cursor-pointer items-center gap-1.5 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-kumo-ring"
+            className="!max-w-full !justify-start !px-0"
           >
             <h3 className="m-0 truncate text-[13px] font-medium leading-[18px] tracking-[-0.25px] text-kumo-default">
               {record.description.title}
@@ -626,7 +621,7 @@ function ReviewRequest({
               size={12}
               className={`flex-shrink-0 text-kumo-inactive transition-transform duration-150 ${expanded ? 'rotate-90' : ''}`}
             />
-          </button>
+          </Button>
           <p className="mt-0.5 truncate text-[11.5px] leading-4 tracking-[-0.1px] text-kumo-inactive">
             {resourceUrl ? (
               <a
@@ -680,13 +675,8 @@ function HistoryRow({
   const status = activityStatus(record)
 
   return (
-    <div className={expanded ? 'bg-kumo-elevated/30' : ''}>
-      <button
-        type="button"
-        onClick={onToggle}
-        aria-expanded={expanded}
-        className="group grid w-full cursor-pointer grid-cols-[54px_minmax(0,1fr)_auto_16px] items-center gap-3 border-b border-kumo-line/70 px-5 py-[7px] text-left transition-colors hover:bg-kumo-elevated/50"
-      >
+    <Collapsible.Root open={expanded} onOpenChange={onToggle} className={expanded ? 'bg-kumo-elevated/30' : ''}>
+      <Collapsible.Trigger className="group grid w-full cursor-pointer grid-cols-[54px_minmax(0,1fr)_auto_16px] items-center gap-3 border-b border-kumo-line/70 px-5 py-[7px] text-left transition-colors hover:bg-kumo-elevated/50">
         <time className="text-[11.5px] tabular-nums leading-4 text-kumo-inactive">
           {formatClockTime(at)}
         </time>
@@ -707,10 +697,9 @@ function HistoryRow({
           size={12}
           className={`text-kumo-inactive transition-transform duration-150 ${expanded ? 'rotate-90' : ''}`}
         />
-      </button>
+      </Collapsible.Trigger>
 
-      {expanded && (
-        <div className="border-b border-kumo-line/70 px-5 pb-3 pl-[86px] pt-1">
+      <Collapsible.Panel className="border-b border-kumo-line/70 px-5 pb-3 pl-[86px] pt-1">
           {record.description.description && (
             <p className="m-0 whitespace-pre-wrap text-[13px] leading-[18px] tracking-[-0.25px] text-kumo-subtle">
               {record.description.description}
@@ -742,9 +731,8 @@ function HistoryRow({
               />
             )}
           </div>
-        </div>
-      )}
-    </div>
+      </Collapsible.Panel>
+    </Collapsible.Root>
   )
 }
 
