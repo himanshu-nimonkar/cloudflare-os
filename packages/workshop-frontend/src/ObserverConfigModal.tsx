@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
-import { Dialog, Select, Loader, Text, useKumoToastManager } from '@cloudflare/kumo'
-import { Warning, Plus, ArrowClockwise, CheckCircle } from '@phosphor-icons/react'
+import { Button, Dialog, Select, Loader, Text, useKumoToastManager } from '@cloudflare/kumo'
+import { Warning, Plus, CheckCircle } from '@phosphor-icons/react'
 import { RpcStub } from 'capnweb'
 import {
   AuthenticatedApi,
@@ -427,21 +427,18 @@ export default function ObserverConfigModal({
                       {/* Scope expansion also replaces expired credentials, so prefer this over the
                           plain re-authentication path when both apply. */}
                       {chosen && missing.length > 0 && (
-                        <button
-                          type="button"
+                        <Button
+                          variant="ghost"
+                          size="xs"
+                          icon={Warning}
+                          loading={granting === chosen.id}
                           onClick={() => handleGrantResourceAccess(need, chosen)}
-                          disabled={granting === chosen.id}
-                          className="flex items-center gap-1.5 text-xs text-kumo-warning hover:underline disabled:opacity-60"
+                          className="!h-auto !justify-start !px-0 !text-kumo-warning hover:underline"
                         >
-                          {granting === chosen.id ? (
-                            <ArrowClockwise size={12} className="animate-spin" />
-                          ) : (
-                            <Warning size={12} />
-                          )}
                           {granting === chosen.id
                             ? 'Waiting for access…'
                             : 'Grant the access needed to verify this resource'}
-                        </button>
+                        </Button>
                       )}
 
                       {/* Offer re-authentication when we know the credentials are stale, and also
@@ -451,35 +448,33 @@ export default function ObserverConfigModal({
                           safe for an account that merely *may* be expiring. */}
                       {chosen && missing.length === 0 &&
                         (!chosen.credentialsValid || chosen.id === need.failure?.accountId) && (
-                        <button
-                          type="button"
+                        <Button
+                          variant="ghost"
+                          size="xs"
+                          icon={Warning}
+                          loading={reconnecting === chosen.id}
                           onClick={() => handleReconnect(chosen.id)}
-                          disabled={reconnecting === chosen.id}
-                          className="flex items-center gap-1.5 text-xs text-kumo-warning hover:underline disabled:opacity-60"
+                          className="!h-auto !justify-start !px-0 !text-kumo-warning hover:underline"
                         >
-                          {reconnecting === chosen.id ? (
-                            <ArrowClockwise size={12} className="animate-spin" />
-                          ) : (
-                            <Warning size={12} />
-                          )}
                           {reconnecting === chosen.id
                             ? 'Re-authenticating…'
                             : chosen.credentialsValid
                               ? 'Click to re-authenticate this account'
                               : 'This account has expired — click to re-authenticate'}
-                        </button>
+                        </Button>
                       )}
 
                       {!vendor?.autoProvisionsAccount && (
-                        <button
-                          type="button"
+                        <Button
+                          variant="ghost"
+                          size="xs"
+                          icon={Plus}
+                          loading={connecting === need.vendorId}
                           onClick={() => handleConnect(need)}
-                          disabled={connecting === need.vendorId}
-                          className="flex items-center gap-1 text-xs text-kumo-subtle hover:text-kumo-default disabled:opacity-60 self-start"
+                          className="!h-auto !justify-start !self-start !px-0 !text-kumo-subtle hover:!text-kumo-default"
                         >
-                          <Plus size={11} />
                           {connecting === need.vendorId ? 'Waiting for connection…' : 'Connect a different account'}
-                        </button>
+                        </Button>
                       )}
                     </div>
                   )}

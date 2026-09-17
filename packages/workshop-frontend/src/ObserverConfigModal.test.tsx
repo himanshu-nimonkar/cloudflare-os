@@ -33,6 +33,9 @@ vi.mock('@cloudflare/kumo', () => {
     Loader: () => <span>Loading</span>,
     Select,
     Text: ({ children }: { children: ReactNode }) => <p>{children}</p>,
+    Button: ({ children, ...props }: ComponentProps<'button'>) => (
+      <button type="button" {...props}>{children}</button>
+    ),
     useKumoToastManager: () => ({ add: vi.fn<(toast: unknown) => void>() }),
   }
 })

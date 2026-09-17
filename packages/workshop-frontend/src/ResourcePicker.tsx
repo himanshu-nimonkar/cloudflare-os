@@ -1,6 +1,6 @@
 import { logRpcFailure } from './rpcErrors'
 import { useState, useEffect, useMemo, useCallback, type MutableRefObject } from 'react'
-import { Tooltip, useKumoToastManager } from '@cloudflare/kumo'
+import { Loader, Tooltip, useKumoToastManager } from '@cloudflare/kumo'
 import { Plus, CaretRight, Warning } from '@phosphor-icons/react'
 import { RpcStub } from 'capnweb'
 import { AuthenticatedApi } from '@gadgets/workshop-shared/api'
@@ -573,7 +573,7 @@ export default function ResourcePicker({
                         )}
                       </span>
                       {isReconnecting || isGranting ? (
-                        <div className="h-3 w-3 flex-shrink-0 animate-spin rounded-full border-2 border-kumo-brand border-t-transparent" />
+                        <Loader size={12} className="flex-shrink-0" />
                       ) : isExpired ? (
                         <span className="flex flex-shrink-0 items-center gap-1">
                           <Warning size={12} className="text-kumo-warning" />
@@ -617,7 +617,7 @@ export default function ResourcePicker({
                   >
                     <span className="grid h-6 w-6 flex-shrink-0 place-items-center rounded-md border border-dashed border-kumo-line text-kumo-inactive">
                       {connectingVendor === vendor.id ? (
-                        <span className="h-3 w-3 animate-spin rounded-full border-2 border-kumo-brand border-t-transparent" />
+                        <Loader size={12} />
                       ) : (
                         <Plus size={11} />
                       )}
