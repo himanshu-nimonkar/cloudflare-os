@@ -1,6 +1,6 @@
 import { logRpcFailure } from './rpcErrors'
 import { useState, useEffect, useRef, useCallback } from 'react'
-import { useKumoToastManager } from '@cloudflare/kumo'
+import { Button, useKumoToastManager } from '@cloudflare/kumo'
 import { useAuthenticatedApi } from './AuthContext'
 import {
   AiChatAuthorInfo,
@@ -545,13 +545,14 @@ export default function OnboardingWizard({
                       )}
                     </div>
 
-                    <button
+                    <Button
+                      variant="outline"
+                      icon={Plus}
                       onClick={() => setAddModelOpen(true)}
-                      className="mt-3 w-full flex items-center justify-center gap-2 px-4 py-2.5 text-sm font-medium text-kumo-subtle border border-dashed border-kumo-line rounded-xl hover:border-kumo-fill hover:text-kumo-default hover:bg-kumo-tint transition-colors"
+                      className="mt-3 w-full !justify-center !rounded-xl border-dashed text-kumo-subtle hover:text-kumo-default"
                     >
-                      <Plus size={14} weight="bold" />
                       Add new model...
-                    </button>
+                    </Button>
                   </>
                 )}
               </div>
@@ -651,12 +652,9 @@ export default function OnboardingWizard({
           <div className="flex items-center justify-between gap-3 border-t border-kumo-line bg-kumo-elevated px-5 py-4 sm:px-8 sm:py-5">
             {/* Back button (hidden on first step) */}
             {step > 0 ? (
-              <button
-                onClick={goBack}
-                className="text-sm text-kumo-subtle hover:text-kumo-default transition-colors"
-              >
+              <Button variant="ghost" size="sm" onClick={goBack} className="text-kumo-subtle hover:text-kumo-default">
                 Back
-              </button>
+              </Button>
             ) : (
               <span />
             )}
@@ -664,38 +662,25 @@ export default function OnboardingWizard({
             <div className="flex items-center gap-3">
               {/* Primary action */}
               {step < totalSteps - 1 ? (
-                <button
-                  onClick={goNext}
-                  className="flex items-center gap-2 px-5 py-2.5 text-sm font-medium rounded-lg transition-all duration-150 text-kumo-inverse bg-kumo-brand hover:bg-kumo-brand-hover"
-                >
+                <Button variant="primary" className="!bg-kumo-brand enabled:hover:!bg-kumo-brand-hover" onClick={goNext}>
                   Next
                   <ArrowRight size={14} weight="bold" />
-                </button>
+                </Button>
               ) : (
-                <button
+                <Button
+                  variant="primary"
+                  className="!bg-kumo-brand enabled:hover:!bg-kumo-brand-hover"
                   onClick={handleFinish}
                   disabled={finishing}
-                  className={`
-                    flex items-center gap-2 px-5 py-2.5 text-sm font-medium rounded-lg
-                    transition-all duration-150
-                    ${!finishing
-                      ? 'text-kumo-inverse bg-kumo-brand hover:bg-kumo-brand-hover'
-                      : 'text-kumo-inactive bg-kumo-tint cursor-not-allowed'
-                    }
-                  `}
+                  loading={finishing}
                 >
-                  {finishing ? (
-                    <>
-                      <div className="w-4 h-4 border-2 border-kumo-inverse/30 border-t-kumo-inverse rounded-full animate-spin" />
-                      Setting up...
-                    </>
-                  ) : (
+                  {finishing ? 'Setting up...' : (
                     <>
                       Let&apos;s build
                       <ArrowRight size={14} weight="bold" />
                     </>
                   )}
-                </button>
+                </Button>
               )}
             </div>
           </div>

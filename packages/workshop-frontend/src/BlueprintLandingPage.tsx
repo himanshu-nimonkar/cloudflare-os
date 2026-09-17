@@ -4,7 +4,7 @@ import { useNavigate, useParams, useRouter } from '@tanstack/react-router'
 import { RpcStub } from 'capnweb'
 import { PublicApi, AuthenticatedApi, AdminApi, BlueprintPublicInfo, BlueprintBinding, BlueprintBindingAssignment, BlueprintUserSummary, AiChatAuthorInfo } from '@gadgets/workshop-shared/api'
 import { SupportedResource, VendorDescription, ResourceConfiguratorFrame } from '@gadgets/workshop-shared/gatekeeper'
-import { Button, Dialog, DropdownMenu, Select, Tooltip, useKumoToastManager } from '@cloudflare/kumo'
+import { Button, Dialog, DropdownMenu, Select, useKumoToastManager } from '@cloudflare/kumo'
 import { ArrowsOutSimple, ArrowLeft, ArrowSquareOut, DotsThree, DownloadSimple, Lightning, Plus, Robot, Sparkle, Star, Trash, X } from '@phosphor-icons/react'
 
 import { useAuth } from './useAuth'
@@ -776,8 +776,10 @@ export default function BlueprintLandingPage({ rpcStub }: Props) {
   return (
     <div className="min-h-full bg-kumo-base">
       <div className="mx-auto w-full max-w-5xl px-6 pb-16 pt-10 sm:px-10">
-        <button
-          type="button"
+        <Button
+          variant="ghost"
+          size="sm"
+          icon={<ArrowLeft size={14} weight="bold" />}
           onClick={() => {
             if (router.history.canGoBack()) {
               router.history.back()
@@ -785,11 +787,10 @@ export default function BlueprintLandingPage({ rpcStub }: Props) {
               navigate({ to: '/explore' })
             }
           }}
-          className="mb-8 inline-flex cursor-pointer items-center gap-2 px-1 py-1 text-[13px] leading-[18px] font-medium tracking-[-0.25px] text-kumo-subtle transition-[color,transform] duration-150 ease-out hover:text-kumo-default active:scale-[0.98]"
+          className="mb-8 !px-1 !text-kumo-subtle hover:!text-kumo-default"
         >
-          <ArrowLeft size={14} weight="bold" />
           Back
-        </button>
+        </Button>
 
         <header className="mb-10 grid gap-7 lg:grid-cols-[minmax(0,1fr)_360px] lg:items-start">
           <div className="min-w-0">
@@ -825,28 +826,29 @@ export default function BlueprintLandingPage({ rpcStub }: Props) {
             )}
             <div className="flex items-center gap-2">
               <span className="min-w-0 flex-1">
-                <button
-                  type="button"
-                  onClick={handleStartConfigure}
+                <Button
+                  variant="primary"
+                  size="lg"
+                  loading={creating}
                   disabled={createDisabled}
-                  className="press inline-flex h-10 w-full cursor-pointer items-center justify-center rounded-lg bg-kumo-brand px-4 text-[14px] leading-5 font-semibold tracking-[-0.25px] text-white transition-colors duration-150 ease-out hover:bg-kumo-brand-hover disabled:cursor-not-allowed disabled:opacity-60"
+                  onClick={handleStartConfigure}
+                  className="!w-full !bg-kumo-brand enabled:hover:!bg-kumo-brand-hover"
                 >
                   {creating ? 'Creating...' : primaryActionLabel}
-                </button>
+                </Button>
               </span>
 
             {!isOwnBlueprint && !loadingOwnBlueprintState && !isInLibrary && (
-              <Tooltip content={isAuthenticated ? 'Add to library' : 'Log in to add to library'} asChild>
-                <button
-                  type="button"
-                  aria-label={isAuthenticated ? 'Add blueprint to library' : 'Log in to add blueprint to library'}
-                  onClick={handleAddToLibrary}
-                  disabled={addingToLibrary || loadingLibraryState}
-                  className="press inline-flex h-10 w-10 shrink-0 cursor-pointer items-center justify-center rounded-lg border border-kumo-line bg-kumo-base p-0 text-kumo-subtle transition-colors duration-150 ease-out hover:border-kumo-fill hover:bg-kumo-tint hover:text-kumo-default disabled:cursor-not-allowed disabled:opacity-60"
-                >
-                  <Plus size={17} weight="bold" />
-                </button>
-              </Tooltip>
+              <Button
+                variant="secondary"
+                shape="square"
+                size="lg"
+                icon={<Plus size={17} weight="bold" />}
+                title={isAuthenticated ? 'Add to library' : 'Log in to add to library'}
+                aria-label={isAuthenticated ? 'Add blueprint to library' : 'Log in to add blueprint to library'}
+                onClick={handleAddToLibrary}
+                disabled={addingToLibrary || loadingLibraryState}
+              />
             )}
 
             <DropdownMenu>
@@ -992,7 +994,15 @@ export default function BlueprintLandingPage({ rpcStub }: Props) {
           {error && (
             <div className="flex items-center justify-between gap-3 rounded-2xl border border-kumo-danger/30 bg-kumo-danger-tint px-4 py-3 text-[13px] leading-[18px] text-kumo-danger">
               <span>{error}</span>
-              <button onClick={() => setError(null)} className="cursor-pointer text-kumo-danger hover:text-kumo-default">&times;</button>
+              <Button
+                variant="ghost"
+                shape="square"
+                size="xs"
+                aria-label="Dismiss error"
+                onClick={() => setError(null)}
+                className="!text-kumo-danger hover:!text-kumo-default"
+                icon={<X size={14} weight="bold" />}
+              />
             </div>
           )}
         </main>
@@ -1187,13 +1197,13 @@ function BlueprintStatePage({
             </p>
           )}
           {actionLabel && onAction && (
-            <button
-              type="button"
+            <Button
+              variant="secondary"
               onClick={onAction}
-              className="mt-5 inline-flex h-9 cursor-pointer items-center justify-center rounded-full border border-kumo-line bg-kumo-base px-4 text-[13px] leading-[18px] font-medium tracking-[-0.25px] text-kumo-default transition-[background-color,border-color,transform] duration-150 ease-out hover:border-kumo-fill hover:bg-kumo-tint active:scale-[0.98]"
+              className="mt-5 !rounded-full"
             >
               {actionLabel}
-            </button>
+            </Button>
           )}
         </div>
       </div>
@@ -1315,13 +1325,9 @@ function BlueprintBindingSummaryCard({
               : detail}
         </p>
       </div>
-      <button
-        type="button"
-        onClick={onConfigure}
-        className="press inline-flex h-8 cursor-pointer items-center justify-center rounded-lg border border-kumo-line bg-kumo-base px-3 text-[12px] leading-4 font-medium tracking-[-0.2px] text-kumo-default transition-colors duration-150 ease-out hover:border-kumo-fill hover:bg-kumo-tint"
-      >
+      <Button variant="secondary" size="sm" onClick={onConfigure}>
         {actionLabel}
-      </button>
+      </Button>
     </div>
   )
 }

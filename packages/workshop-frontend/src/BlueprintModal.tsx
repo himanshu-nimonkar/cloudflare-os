@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState, type ChangeEvent } from 'react'
-import { Dialog, useKumoToastManager } from '@cloudflare/kumo'
+import { Badge, Button, Dialog, useKumoToastManager } from '@cloudflare/kumo'
 import { ArrowsClockwise, Check, Copy, ImageSquare, Pencil, Plus, Trash, Warning, X } from '@phosphor-icons/react'
 import { RpcStub } from 'capnweb'
 import { BlueprintGadgetSummary, GadgetClient, GadgetMetadata, Overseer, BlueprintBindingAnnotation, BlueprintScreenshotUpload } from '@gadgets/workshop-shared/api'
@@ -593,22 +593,23 @@ function BlueprintRow({
               People who started a gadget from this blueprint won't be affected, but the link will stop working.
             </p>
           </div>
-          <button
-            type="button"
+          <Button
+            variant="destructive"
+            size="sm"
             onClick={onConfirmDelete}
             disabled={isDeleting}
-            className="inline-flex h-7 shrink-0 cursor-pointer items-center rounded-md bg-kumo-danger px-2.5 text-[12px] leading-4 font-medium tracking-[-0.2px] text-white transition-opacity hover:opacity-90 disabled:cursor-not-allowed disabled:opacity-50"
+            loading={isDeleting}
           >
             {isDeleting ? 'Deleting...' : 'Delete'}
-          </button>
-          <button
-            type="button"
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
             onClick={onCancelDelete}
             disabled={isDeleting}
-            className="inline-flex h-7 shrink-0 cursor-pointer items-center rounded-md bg-transparent px-2.5 text-[12px] leading-4 font-medium tracking-[-0.2px] text-kumo-subtle transition-colors hover:bg-kumo-tint hover:text-kumo-default disabled:cursor-not-allowed disabled:opacity-50"
           >
             Cancel
-          </button>
+          </Button>
         </div>
       </div>
     )
@@ -623,21 +624,10 @@ function BlueprintRow({
           {bp.title}
         </p>
 
-        <span
-          className={`inline-flex shrink-0 items-center gap-1.5 rounded-full border px-2 py-0.5 text-[11px] leading-4 font-semibold tracking-[-0.1px] ${
-            bp.dirty
-              ? 'border-kumo-brand/25 bg-kumo-brand/10 text-kumo-brand'
-              : 'border-kumo-line bg-kumo-tint text-kumo-subtle'
-          }`}
-          title={bp.dirty ? 'Last publish failed' : undefined}
-        >
-          {bp.dirty && (
-            <span
-              className="inline-block h-1.5 w-1.5 shrink-0 rounded-full bg-kumo-brand"
-              aria-hidden="true"
-            />
-          )}
-          v{bp.version} · {new Date(bp.codeVersionDate).toLocaleDateString()}
+        <span title={bp.dirty ? 'Last publish failed' : undefined}>
+          <Badge variant={bp.dirty ? 'warning' : 'secondary'} className="shrink-0">
+            v{bp.version} · {new Date(bp.codeVersionDate).toLocaleDateString()}
+          </Badge>
         </span>
       </div>
 
@@ -655,15 +645,17 @@ function BlueprintRow({
 
       <div className="mt-3 flex flex-wrap items-center justify-between gap-2">
         <div className="-ml-[7px] flex flex-wrap items-center gap-1">
-          <GhostButton onClick={onUpdateCode} icon={<ArrowsClockwise size={13} />}>
+          <Button variant="ghost" size="xs" onClick={onUpdateCode} icon={<ArrowsClockwise size={13} />}>
             Update code
-          </GhostButton>
+          </Button>
           {bp.dirty && (
-            <GhostButton onClick={onRetryPublish} icon={<ArrowsClockwise size={13} />}>
+            <Button variant="ghost" size="xs" onClick={onRetryPublish} icon={<ArrowsClockwise size={13} />}>
               Retry publish
-            </GhostButton>
+            </Button>
           )}
-          <GhostButton
+          <Button
+            variant="ghost"
+            size="xs"
             onClick={async () => {
               setCopyState(await onCopyLink() ? 'copied' : 'failed')
             }}
@@ -676,48 +668,29 @@ function BlueprintRow({
             }
           >
             {copyState === 'copied' ? 'Copied' : copyState === 'failed' ? 'Copy failed' : 'Copy link'}
-          </GhostButton>
+          </Button>
         </div>
         <div className="-mr-1.5 ml-auto flex items-center gap-0.5 opacity-60 transition-opacity group-hover/row:opacity-100 focus-within:opacity-100">
-          <button
-            type="button"
+          <Button
+            variant="ghost"
+            shape="square"
+            size="xs"
             onClick={onStartEdit}
-            className="inline-flex h-7 w-7 cursor-pointer items-center justify-center rounded-md bg-transparent text-kumo-subtle transition-colors hover:bg-kumo-tint hover:text-kumo-default"
             aria-label="Edit blueprint"
-          >
-            <Pencil size={13} />
-          </button>
-          <button
-            type="button"
+            icon={<Pencil size={13} />}
+          />
+          <Button
+            variant="ghost"
+            shape="square"
+            size="xs"
             onClick={onStartDelete}
-            className="inline-flex h-7 w-7 cursor-pointer items-center justify-center rounded-md bg-transparent text-kumo-subtle transition-colors hover:bg-kumo-danger-tint hover:text-kumo-danger"
+            className="hover:!bg-kumo-danger-tint hover:!text-kumo-danger"
             aria-label="Delete blueprint"
-          >
-            <Trash size={13} />
-          </button>
+            icon={<Trash size={13} />}
+          />
         </div>
       </div>
     </div>
   )
 }
 
-function GhostButton({
-  onClick,
-  icon,
-  children,
-}: {
-  onClick: () => void | Promise<void>
-  icon: React.ReactNode
-  children: React.ReactNode
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className="inline-flex h-7 cursor-pointer items-center gap-1.5 rounded-md bg-transparent px-2 text-[12px] leading-4 font-medium tracking-[-0.2px] text-kumo-subtle transition-colors hover:bg-kumo-tint hover:text-kumo-default"
-    >
-      {icon}
-      {children}
-    </button>
-  )
-}
