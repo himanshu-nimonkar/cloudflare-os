@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react'
+import { Button } from '@cloudflare/kumo'
 import { Columns, Rows } from '@phosphor-icons/react'
 import { Compartment, EditorState } from '@codemirror/state'
 import type { Extension } from '@codemirror/state'
@@ -430,27 +431,27 @@ export default function CodeDiffEditor({
       >
         <div className="absolute right-3 top-3 flex items-center gap-2" style={{ zIndex: 1 }}>
           <div className="flex h-7 items-center gap-0.5 rounded-lg border border-kumo-line bg-kumo-base px-0.5 shadow-sm">
-            <button
-              type="button"
-              className={layoutButtonClass(diffLayoutPreference === 'stacked')}
+            <Button
+              variant="ghost"
+              shape="square"
+              icon={<Rows size={15} weight="regular" />}
+              className={`!h-[22px] !w-[22px] ${layoutButtonClass(diffLayoutPreference === 'stacked')}`}
               title="Stacked diff"
               aria-label="Use stacked diff layout"
               aria-pressed={diffLayoutPreference === 'stacked'}
               onClick={() => setDiffLayoutPreference('stacked')}
-            >
-              <Rows size={15} weight="regular" />
-            </button>
-            <button
-              type="button"
-              className={layoutButtonClass(diffLayoutPreference === 'split' && canSplitDiff, !canSplitDiff)}
+            />
+            <Button
+              variant="ghost"
+              shape="square"
+              icon={<Columns size={15} weight="regular" />}
+              className={`!h-[22px] !w-[22px] ${layoutButtonClass(diffLayoutPreference === 'split' && canSplitDiff, !canSplitDiff)}`}
               title={canSplitDiff ? 'Split diff' : 'Split diff needs more space'}
               aria-label="Use split diff layout"
               aria-pressed={diffLayoutPreference === 'split' && canSplitDiff}
               disabled={!canSplitDiff}
               onClick={() => setDiffLayoutPreference('split')}
-            >
-              <Columns size={15} weight="regular" />
-            </button>
+            />
           </div>
           <div
             className="pointer-events-none flex h-7 items-center gap-2 rounded-lg border border-kumo-line bg-kumo-base px-2 font-mono text-[11px] leading-4 tracking-[-0.2px] shadow-sm"

@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { DropdownMenu, Tooltip, useKumoToastManager } from '@cloudflare/kumo'
+import { Button, DropdownMenu, Tooltip, useKumoToastManager } from '@cloudflare/kumo'
 import { DownloadSimple } from '@phosphor-icons/react'
 import type { RpcStub } from 'capnweb'
 import type { GadgetClient } from '@gadgets/workshop-shared/api'
@@ -111,13 +111,14 @@ export default function GadgetExportMenu({ gadget, gadgetTitle, chatId }: Props)
             ) : loadFailed ? (
               <div className="px-2.5 py-2 text-[12px] leading-4 text-kumo-subtle">
                 <p>Export formats could not be loaded.</p>
-                <button
-                  type="button"
+                <Button
+                  variant="ghost"
+                  size="sm"
                   onClick={loadFormats}
-                  className="mt-1 font-medium text-kumo-default hover:underline"
+                  className="mt-1 !h-auto !px-0 font-medium underline-offset-2 hover:underline"
                 >
                   Try again
-                </button>
+                </Button>
               </div>
             ) : formats?.length === 0 ? (
               <p className="px-2.5 py-2 text-[12px] leading-4 text-kumo-subtle">

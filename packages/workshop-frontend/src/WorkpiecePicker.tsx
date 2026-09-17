@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { CaretLeft, CaretRight, Check, Lightning, PencilSimple, Pulse, X } from '@phosphor-icons/react'
 import { FormatGlyph } from './components/format/FormatVisuals'
-import { Tooltip } from '@cloudflare/kumo'
+import { Button, Tooltip } from '@cloudflare/kumo'
 import type { WorkpieceId, WorkpieceSummary } from '@gadgets/workshop-shared/api'
 import { CountBadge } from './components/CountBadge'
 import { WorkshopIconButton, WorkshopInput } from './components/WorkshopControls'
@@ -58,21 +58,21 @@ export default function WorkpiecePicker({
       className="flex flex-shrink-0 flex-col overflow-hidden border-l border-kumo-line bg-kumo-elevated transition-[width] duration-200 ease-out"
       style={{ width: expanded ? WORKPIECE_RAIL_EXPANDED_WIDTH : WORKPIECE_RAIL_COLLAPSED_WIDTH }}
     >
-      <button
-        type="button"
+      <Button
+        variant="ghost"
         onClick={toggleExpanded}
         title={expanded ? 'Collapse outputs' : 'Expand outputs'}
         aria-label={expanded ? 'Collapse outputs' : 'Expand outputs'}
         aria-expanded={expanded}
-        className={`flex h-12 flex-shrink-0 cursor-pointer items-center text-kumo-inactive transition-colors hover:text-kumo-subtle ${
-          expanded ? 'justify-between px-3' : 'justify-center'
+        className={`!h-12 !flex-shrink-0 !text-kumo-inactive hover:!text-kumo-subtle ${
+          expanded ? '!w-full !justify-between !px-3' : '!w-full !justify-center'
         }`}
       >
         {expanded && (
           <span className="text-[11px] font-medium uppercase tracking-[0.06em]">Outputs</span>
         )}
         {expanded ? <CaretRight size={14} /> : <CaretLeft size={14} />}
-      </button>
+      </Button>
 
       <div className="flex flex-1 flex-col gap-0.5 overflow-y-auto overflow-x-hidden px-1.5 pb-2">
         {gadgets.map(gadget => {

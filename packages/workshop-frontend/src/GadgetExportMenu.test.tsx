@@ -50,6 +50,9 @@ vi.mock('@cloudflare/kumo', () => {
     Tooltip: ({ children, content }: { children: ReactNode; content: ReactNode }) => (
       <div data-tooltip={content}>{children}</div>
     ),
+    Button: ({ children, onClick, ...props }: { children: ReactNode; onClick?: () => void }) => (
+      <button type="button" onClick={onClick} {...props}>{children}</button>
+    ),
     useKumoToastManager: () => ({ add: mocks.toast }),
   }
 })

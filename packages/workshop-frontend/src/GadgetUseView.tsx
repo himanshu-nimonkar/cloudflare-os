@@ -1,4 +1,5 @@
 import { Link } from '@tanstack/react-router'
+import { Tabs } from '@cloudflare/kumo'
 import { Hexagon } from '@phosphor-icons/react'
 import { FormatGlyph } from './components/format/FormatVisuals'
 import { RpcStub } from 'capnweb'
@@ -85,25 +86,22 @@ export default function GadgetUseView({
 
         {/* Center: gadget picker (only when there's a real choice) */}
         {gadgets.length > 1 && (
-          <div className="hidden min-w-0 items-center gap-1 overflow-x-auto md:flex">
-            {gadgets.map(g => (
-              <button
-                key={g.id}
-                type="button"
-                onClick={() => onSelectGadget(g.id)}
-                aria-current={g.id === selectedGadgetId ? 'true' : undefined}
-                className={`flex-shrink-0 cursor-pointer rounded-full px-3 py-1 text-[12px] leading-4 tracking-[-0.2px] transition-colors duration-150 ease-out ${
-                  g.id === selectedGadgetId
-                    ? 'bg-kumo-contrast font-medium text-kumo-inverse'
-                    : 'bg-kumo-tint text-kumo-subtle hover:text-kumo-default'
-                }`}
-              >
-                <span className="flex items-center gap-1.5">
-                  <FormatGlyph output={g.output} size="sm" className="flex-shrink-0" weight="regular" />
-                  <span className="block max-w-[160px] truncate">{g.title}</span>
-                </span>
-              </button>
-            ))}
+          <div className="hidden min-w-0 items-center overflow-x-auto md:flex">
+            <Tabs
+              variant="segmented"
+              size="sm"
+              value={selectedGadgetId === null ? undefined : String(selectedGadgetId)}
+              onValueChange={(value) => onSelectGadget(Number(value) as WorkpieceId)}
+              tabs={gadgets.map(g => ({
+                value: String(g.id),
+                label: (
+                  <span className="flex items-center gap-1.5">
+                    <FormatGlyph output={g.output} size="sm" className="flex-shrink-0" weight="regular" />
+                    <span className="block max-w-[160px] truncate">{g.title}</span>
+                  </span>
+                ),
+              }))}
+            />
           </div>
         )}
 
@@ -125,22 +123,16 @@ export default function GadgetUseView({
       </div>
 
       {gadgets.length > 1 && (
-        <div className="flex h-12 shrink-0 items-center gap-1 overflow-x-auto border-b border-kumo-line px-2 md:hidden">
-          {gadgets.map(g => (
-            <button
-              key={g.id}
-              type="button"
-              onClick={() => onSelectGadget(g.id)}
-              aria-current={g.id === selectedGadgetId ? 'true' : undefined}
-              className={`h-9 max-w-[180px] shrink-0 truncate rounded-lg px-3 text-[14px] font-medium ${
-                g.id === selectedGadgetId
-                  ? 'bg-kumo-tint text-kumo-default'
-                  : 'text-kumo-subtle'
-              }`}
-            >
-              {g.title}
-            </button>
-          ))}
+        <div className="flex h-12 shrink-0 items-center overflow-x-auto border-b border-kumo-line px-2 md:hidden">
+          <Tabs
+            variant="segmented"
+            value={selectedGadgetId === null ? undefined : String(selectedGadgetId)}
+            onValueChange={(value) => onSelectGadget(Number(value) as WorkpieceId)}
+            tabs={gadgets.map(g => ({
+              value: String(g.id),
+              label: <span className="block max-w-[160px] truncate">{g.title}</span>,
+            }))}
+          />
         </div>
       )}
 

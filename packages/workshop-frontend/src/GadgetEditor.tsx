@@ -1,6 +1,6 @@
-import { useState, useEffect, useCallback, useMemo, useRef, type PointerEvent as ReactPointerEvent } from 'react'
+import { useState, useEffect, useCallback, useMemo, useRef, type PointerEvent as ReactPointerEvent, type ReactNode } from 'react'
 import { useParams, useNavigate, useSearch, Link } from '@tanstack/react-router'
-import { DropdownMenu, useKumoToastManager } from '@cloudflare/kumo'
+import { DropdownMenu, Tabs, useKumoToastManager } from '@cloudflare/kumo'
 import {
   ShareNetwork,
   Pencil,
@@ -178,11 +178,21 @@ function rightTabs(output?: BlueprintOutput): { value: RightTab; label: string }
   ]
 }
 
-const ACTIVITY_TABS: { value: ActivityView; label: string }[] = [
-  { value: 'review', label: 'Needs review' },
-  { value: 'auto', label: 'Auto-approval' },
-  { value: 'history', label: 'History' },
-]
+function activityTabItems(pendingActionCount: number): { value: ActivityView; label: ReactNode }[] {
+  return [
+    {
+      value: 'review',
+      label: (
+        <span className="inline-flex items-center gap-1.5">
+          Needs review
+          <CountBadge count={pendingActionCount} />
+        </span>
+      ),
+    },
+    { value: 'auto', label: 'Auto-approval' },
+    { value: 'history', label: 'History' },
+  ]
+}
 
 // Names what the pane is showing. `icon` is for the workspace-level views (Activity); a workpiece
 // passes its `output` instead, so a Doc gets a document glyph rather than the gadget hexagon.
@@ -301,31 +311,6 @@ function PaneWorkpieceTabs({
         )
       })}
     </div>
-  )
-}
-
-function PaneTab({
-  active,
-  label,
-  count,
-  onClick,
-}: {
-  active: boolean
-  label: string
-  count?: number
-  onClick: () => void
-}) {
-  return (
-    <button
-      type="button"
-      onClick={onClick}
-      className={`relative flex cursor-pointer items-center gap-1.5 rounded-md px-2 py-1 text-[12.5px] font-medium tracking-[-0.15px] transition-colors duration-150 ${
-        active ? 'bg-kumo-tint text-kumo-default' : 'text-kumo-subtle hover:text-kumo-default'
-      }`}
-    >
-      {label}
-      <CountBadge count={count ?? 0} />
-    </button>
   )
 }
 
@@ -1757,26 +1742,23 @@ export default function GadgetEditor() {
             </div>
 
             <div className="flex flex-shrink-0 items-center gap-1.5">
-              <div className="flex items-center rounded-lg border border-kumo-line p-0.5">
-                {paneShowsActivity
-                  ? ACTIVITY_TABS.map(tab => (
-                    <PaneTab
-                      key={tab.value}
-                      active={activityView === tab.value}
-                      label={tab.label}
-                      count={tab.value === 'review' ? pendingActionCount : undefined}
-                      onClick={() => setActivityView(tab.value)}
-                    />
-                  ))
-                  : rightTabs(selectedGadgetSummary?.output).map(tab => (
-                    <PaneTab
-                      key={tab.value}
-                      active={activeTab === tab.value}
-                      label={tab.label}
-                      onClick={() => handleTabSelect(tab.value)}
-                    />
-                  ))}
-              </div>
+              {paneShowsActivity ? (
+                <Tabs
+                  variant="segmented"
+                  size="sm"
+                  value={activityView}
+                  onValueChange={(value) => setActivityView(value as ActivityView)}
+                  tabs={activityTabItems(pendingActionCount)}
+                />
+              ) : (
+                <Tabs
+                  variant="segmented"
+                  size="sm"
+                  value={activeTab}
+                  onValueChange={(value) => handleTabSelect(value as RightTab)}
+                  tabs={rightTabs(selectedGadgetSummary?.output)}
+                />
+              )}
 
               {!paneShowsActivity && (
                 <GadgetExportMenu
@@ -1811,16 +1793,14 @@ export default function GadgetEditor() {
 
           <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
             {paneShowsActivity && (
-              <div className="flex h-11 items-center gap-1 overflow-x-auto border-b border-kumo-line px-2 md:hidden">
-                {ACTIVITY_TABS.map(tab => (
-                  <PaneTab
-                    key={tab.value}
-                    active={activityView === tab.value}
-                    label={tab.label}
-                    count={tab.value === 'review' ? pendingActionCount : undefined}
-                    onClick={() => setActivityView(tab.value)}
-                  />
-                ))}
+              <div className="flex h-11 items-center overflow-x-auto border-b border-kumo-line px-2 md:hidden">
+                <Tabs
+                  variant="segmented"
+                  size="sm"
+                  value={activityView}
+                  onValueChange={(value) => setActivityView(value as ActivityView)}
+                  tabs={activityTabItems(pendingActionCount)}
+                />
               </div>
             )}
             {paneShowsActivity && (
