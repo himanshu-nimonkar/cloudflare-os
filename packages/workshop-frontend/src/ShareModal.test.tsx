@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 /* eslint-disable react/react-in-jsx-scope */
 
-import { act, createElement, isValidElement, type ComponentProps, type ComponentType, type ReactElement, type ReactNode } from 'react'
+import { act } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
 import { afterAll, afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { RpcStub } from 'capnweb'
@@ -42,79 +42,39 @@ afterAll(() => {
   }
 })
 
-// Kumo's `icon` prop accepts either an already-built element or a bare Icon component (as
-// `icon={Link}` passes); mirror that so a test double doesn't choke on a raw component reference.
-function renderIcon(icon: unknown): ReactNode {
-  if (icon == null || isValidElement(icon)) return icon as ReactNode
-  return createElement(icon as ComponentType)
+// Kumo's Dialog and DropdownMenu (both Base UI-backed) measure/position their portaled content
+// and track pointer capture; jsdom implements neither ResizeObserver nor pointer capture.
+vi.stubGlobal('ResizeObserver', class {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+})
+Element.prototype.hasPointerCapture ??= () => false
+Element.prototype.setPointerCapture ??= () => {}
+Element.prototype.releasePointerCapture ??= () => {}
+if (typeof PointerEvent === 'undefined') {
+  class PointerEventPolyfill extends MouseEvent {
+    pointerId: number
+    isPrimary: boolean
+    constructor(type: string, params: MouseEventInit & { pointerId?: number; isPrimary?: boolean } = {}) {
+      super(type, params)
+      this.pointerId = params.pointerId ?? 0
+      this.isPrimary = params.isPrimary ?? true
+    }
+  }
+  vi.stubGlobal('PointerEvent', PointerEventPolyfill)
 }
 
-vi.mock('@cloudflare/kumo', () => {
-  const Dialog = Object.assign(
-    ({ children }: { children: ReactNode }) => <dialog open>{children}</dialog>,
-    {
-      Root: ({ children }: { children: ReactNode }) => <>{children}</>,
-      Title: ({ children }: { children: ReactNode }) => <h2>{children}</h2>,
-      Description: ({ children }: { children: ReactNode }) => <p>{children}</p>,
-      Close: ({ render }: { render: (props: object) => ReactElement }) =>
-        render({ 'aria-label': 'Close' }),
-    },
-  )
-  const DropdownMenu = Object.assign(
-    ({ children }: { children: ReactNode }) => <div>{children}</div>,
-    {
-      Trigger: ({ render }: { render: ReactElement }) => render,
-      Content: ({ children }: { children: ReactNode }) => <div>{children}</div>,
-      Item: ({ children, onClick }: { children: ReactNode; onClick?: () => void }) => (
-        <button type="button" data-testid="role-option" onClick={onClick}>{children}</button>
-      ),
-    },
-  )
+vi.mock('@cloudflare/kumo', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@cloudflare/kumo')>()
   return {
-    Badge: ({ children }: { children: ReactNode }) => <span>{children}</span>,
-    Button: ({
-      children,
-      icon,
-      loading: _loading,
-      variant: _variant,
-      size: _size,
-      shape: _shape,
-      ...props
-    }: ComponentProps<'button'> & {
-      icon?: ReactNode
-      loading?: boolean
-      variant?: string
-      size?: string
-      shape?: string
-    }) => (
-      <button type="button" {...props}>{renderIcon(icon)}{children}</button>
-    ),
-    Checkbox: ({ label }: { label: ReactNode }) => <label>{label}</label>,
-    Dialog,
-    DropdownMenu,
+    ...actual,
     useKumoToastManager: () => ({ add: toastAdd }),
   }
 })
 
-vi.mock('./components/WorkshopControls', () => ({
-  WorkshopButton: ({
-    children,
-    icon,
-    tone: _tone,
-    ...props
-  }: ComponentProps<'button'> & { icon?: ReactNode; tone?: string }) => (
-    <button type="button" {...props}>{renderIcon(icon)}{children}</button>
-  ),
-  WorkshopIconButton: ({
-    children,
-    tone: _tone,
-    danger: _danger,
-    ...props
-  }: ComponentProps<'button'> & { tone?: string; danger?: boolean }) => (
-    <button type="button" {...props}>{children}</button>
-  ),
-}))
-
+// PersonAvatar calls a real avatar-lookup RPC this test's fake AuthenticatedApi doesn't
+// implement; nothing in these tests depends on its output, so this boundary stays mocked.
 vi.mock('./components/PersonAvatar', () => ({
   PersonAvatar: () => <span data-testid="avatar" />,
 }))
@@ -212,6 +172,19 @@ function click(element: Element) {
   })
 }
 
+// A plain `.click()`/`click()` dispatches only a `click` event; Base UI's DropdownMenu trigger
+// also needs the pointerdown/mousedown pair that precedes it to correctly toggle open.
+function realClick(element: Element) {
+  return act(async () => {
+    const pointerOpts = { bubbles: true, cancelable: true, pointerId: 1, isPrimary: true }
+    element.dispatchEvent(new PointerEvent('pointerdown', pointerOpts))
+    element.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, cancelable: true }))
+    element.dispatchEvent(new PointerEvent('pointerup', pointerOpts))
+    element.dispatchEvent(new MouseEvent('mouseup', { bubbles: true, cancelable: true }))
+    element.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }))
+  })
+}
+
 function button(rendered: HTMLElement, label: string): HTMLButtonElement {
   const found = [...rendered.querySelectorAll('button')].find(candidate =>
     candidate.textContent?.trim() === label || candidate.getAttribute('aria-label') === label)
@@ -219,8 +192,16 @@ function button(rendered: HTMLElement, label: string): HTMLButtonElement {
   return found
 }
 
-function roleOption(rendered: HTMLElement, label: string): HTMLButtonElement {
-  const found = [...rendered.querySelectorAll<HTMLButtonElement>('[data-testid="role-option"]')]
+// Opens a RoleMenu (Kumo DropdownMenu) by the aria-label on its trigger button.
+async function openRoleMenu(rendered: HTMLElement, triggerAriaLabel: string) {
+  const trigger = rendered.querySelector<HTMLButtonElement>(`[aria-label="${triggerAriaLabel}"]`)
+  if (!trigger) throw new Error(`No role menu trigger labelled “${triggerAriaLabel}”`)
+  await realClick(trigger)
+}
+
+// DropdownMenu.Item renders as a real element with data-kumo-part="item", not a <button>.
+function roleOption(rendered: HTMLElement, label: string): HTMLElement {
+  const found = [...rendered.querySelectorAll<HTMLElement>('[data-kumo-part="item"]')]
     .find(candidate => candidate.textContent?.startsWith(label))
   if (!found) throw new Error(`No role option for “${label}”`)
   return found
@@ -721,7 +702,7 @@ describe('ShareModal', () => {
     const input = rendered.querySelector<HTMLInputElement>('input[aria-label="Search people"]')!
     const listbox = rendered.querySelector<HTMLDivElement>('[role="listbox"]')!
     const modalScroller = input.closest<HTMLDivElement>('.chat-panel')!
-    expect(listbox.closest('dialog')).not.toBeNull()
+    expect(listbox.closest('[role="dialog"]')).not.toBeNull()
     const targetId = `${input.getAttribute('aria-controls')}-option-6`
     const target = document.getElementById(targetId)!
     listbox.getBoundingClientRect = () => ({
@@ -778,6 +759,7 @@ describe('ShareModal', () => {
     expect(rendered.textContent).toContain('Q3 planning')
     expect(rendered.textContent).not.toContain('Pipeline dashboard')
 
+    await openRoleMenu(rendered, 'Access to grant')
     await click(roleOption(rendered, 'Workspace'))
 
     expect(rendered.textContent).toContain('Pipeline dashboard')
@@ -793,10 +775,14 @@ describe('ShareModal', () => {
     expect(rendered.querySelector('#invite-verification-heading')).toBeNull()
     expect(rendered.querySelector('#link-verification-heading')).toBeNull()
 
-    const buildOptions = [...rendered.querySelectorAll<HTMLButtonElement>('[data-testid="role-option"]')]
-      .filter(option => option.textContent?.startsWith('Workspace'))
-    expect(buildOptions).toHaveLength(2)
-    await click(buildOptions[1])
+    // Both role pickers independently offer "Workspace" (opening one closes the other, so this
+    // is checked one at a time rather than expecting both open together).
+    await openRoleMenu(rendered, 'Access to grant')
+    expect(roleOption(rendered, 'Workspace')).toBeDefined()
+
+    // Only the share-link picker's selection should move — the invite picker is untouched.
+    await openRoleMenu(rendered, 'Access granted by link')
+    await click(roleOption(rendered, 'Workspace'))
 
     expect(verificationSection(rendered, 'invite-verification-heading').textContent)
       .not.toContain('Pipeline dashboard')
