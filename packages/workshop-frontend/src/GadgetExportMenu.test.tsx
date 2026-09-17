@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 /* eslint-disable react/react-in-jsx-scope */
 
-import { act, type ComponentProps, type ReactElement, type ReactNode } from 'react'
+import { act } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
 import { afterAll, afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { RpcStub } from 'capnweb'
@@ -16,6 +16,30 @@ afterAll(() => {
   else testGlobal.IS_REACT_ACT_ENVIRONMENT = previousActEnvironment
 })
 
+// Kumo's DropdownMenu (Base UI Menu) measures its trigger/content and tracks pointer capture for
+// touch drag-to-select; jsdom implements none of that.
+vi.stubGlobal('ResizeObserver', class {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+})
+Element.prototype.hasPointerCapture ??= () => false
+Element.prototype.setPointerCapture ??= () => {}
+Element.prototype.releasePointerCapture ??= () => {}
+// jsdom has no PointerEvent constructor at all.
+if (typeof PointerEvent === 'undefined') {
+  class PointerEventPolyfill extends MouseEvent {
+    pointerId: number
+    isPrimary: boolean
+    constructor(type: string, params: MouseEventInit & { pointerId?: number; isPrimary?: boolean } = {}) {
+      super(type, params)
+      this.pointerId = params.pointerId ?? 0
+      this.isPrimary = params.isPrimary ?? true
+    }
+  }
+  vi.stubGlobal('PointerEvent', PointerEventPolyfill)
+}
+
 const mocks = vi.hoisted(() => ({
   saveStreamToFile: vi.fn<(
     createStream: () => Promise<ReadableStream<Uint8Array>>,
@@ -25,48 +49,16 @@ const mocks = vi.hoisted(() => ({
   toast: vi.fn<(toast: unknown) => void>(),
 }))
 
-vi.mock('@cloudflare/kumo', () => {
-  const DropdownMenu = Object.assign(
-    ({ children, onOpenChange }: {
-      children: ReactNode
-      onOpenChange?: (open: boolean) => void
-    }) => (
-      <div>
-        <button type="button" onClick={() => onOpenChange?.(true)}>open export menu</button>
-        <button type="button" onClick={() => onOpenChange?.(false)}>close export menu</button>
-        {children}
-      </div>
-    ),
-    {
-      Trigger: ({ render }: { render: ReactElement }) => render,
-      Content: ({ children }: { children: ReactNode }) => <div>{children}</div>,
-      Item: ({ children, onClick }: { children: ReactNode; onClick?: () => void }) => (
-        <button type="button" onClick={onClick}>{children}</button>
-      ),
-    },
-  )
+vi.mock('@cloudflare/kumo', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@cloudflare/kumo')>()
   return {
-    DropdownMenu,
-    Tooltip: ({ children, content }: { children: ReactNode; content: ReactNode }) => (
-      <div data-tooltip={content}>{children}</div>
-    ),
-    Button: ({ children, onClick, ...props }: { children: ReactNode; onClick?: () => void }) => (
-      <button type="button" onClick={onClick} {...props}>{children}</button>
-    ),
+    ...actual,
     useKumoToastManager: () => ({ add: mocks.toast }),
   }
 })
 
-vi.mock('@phosphor-icons/react', () => ({
-  DownloadSimple: () => <span>download</span>,
-}))
-
-vi.mock('./components/WorkshopControls', () => ({
-  WorkshopIconButton: ({ children, ...props }: ComponentProps<'button'>) => (
-    <button type="button" {...props}>{children}</button>
-  ),
-}))
-
+// Real browser download / stream-to-disk I/O; there is no jsdom equivalent to exercise, so this
+// boundary stays mocked.
 vi.mock('./fileTransfers', () => ({
   makeExportFilename: (title: string, extension: string) => `${title}${extension}`,
   saveStreamToFile: mocks.saveStreamToFile,
@@ -94,9 +86,55 @@ function gadget(overrides: Partial<GadgetClient>): RpcStub<GadgetClient> {
   return overrides as RpcStub<GadgetClient>
 }
 
-function button(label: string): HTMLButtonElement | undefined {
-  return Array.from(container.querySelectorAll('button'))
+// The real DropdownMenu portals its content to document.body, outside `container`, so lookups
+// search the whole document rather than being scoped to the render root. Its items render as
+// `[role="menuitem"]` elements (not <button>s), alongside real <button>s elsewhere in the tree.
+function button(label: string): HTMLElement | undefined {
+  return Array.from(document.body.querySelectorAll<HTMLElement>('button, [role="menuitem"]'))
     .find(candidate => candidate.textContent === label)
+}
+
+function trigger(): HTMLButtonElement {
+  const found = document.body.querySelector<HTMLButtonElement>('[aria-label="Export Gadget"]')
+  if (!found) throw new Error('Export Gadget trigger not found')
+  return found
+}
+
+// A plain `.click()` only dispatches a `click` event; Base UI's Menu trigger also needs the
+// pointerdown/mousedown pair that precedes it to correctly toggle open/closed.
+function realClick(element: Element) {
+  const pointerOpts = { bubbles: true, cancelable: true, pointerId: 1, isPrimary: true }
+  element.dispatchEvent(new PointerEvent('pointerdown', pointerOpts))
+  element.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, cancelable: true }))
+  element.dispatchEvent(new PointerEvent('pointerup', pointerOpts))
+  element.dispatchEvent(new MouseEvent('mouseup', { bubbles: true, cancelable: true }))
+  element.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }))
+}
+
+async function open() {
+  await act(async () => { realClick(trigger()) })
+}
+
+async function close() {
+  await act(async () => { document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })) })
+}
+
+// Kumo's Tooltip opens on real hover after its default 600ms delay and portals its content, so
+// reading the current label means hovering, waiting the delay out, and reading the popup.
+async function tooltipText(): Promise<string | null> {
+  const el = trigger()
+  await act(async () => {
+    el.dispatchEvent(new PointerEvent('pointerenter', { bubbles: true }))
+    el.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }))
+    el.dispatchEvent(new MouseEvent('mousemove', { bubbles: true }))
+  })
+  await act(async () => { await new Promise(resolve => setTimeout(resolve, 700)) })
+  const text = document.body.querySelector('.kumo-tooltip-popup')?.textContent ?? null
+  await act(async () => {
+    el.dispatchEvent(new PointerEvent('pointerleave', { bubbles: true }))
+    el.dispatchEvent(new MouseEvent('mouseleave', { bubbles: true }))
+  })
+  return text
 }
 
 describe('GadgetExportMenu', () => {
@@ -129,8 +167,8 @@ describe('GadgetExportMenu', () => {
     })
     expect(client.getExportFormats).not.toHaveBeenCalled()
 
-    await act(async () => { button('open export menu')?.click() })
-    await act(async () => { button('CSV')?.click() })
+    await open()
+    await act(async () => { realClick(button('CSV')!) })
 
     expect(client.getExportFormats).toHaveBeenCalledWith(7)
     expect(exportFormat).toHaveBeenCalledWith('csv', 7)
@@ -161,20 +199,19 @@ describe('GadgetExportMenu', () => {
     await act(async () => {
       root.render(<GadgetExportMenu gadget={client} gadgetTitle="Report" />)
     })
-    await act(async () => { button('open export menu')?.click() })
-    await act(async () => { button('CSV')?.click() })
+    await open()
+    await act(async () => { realClick(button('CSV')!) })
 
-    const trigger = container.querySelector<HTMLButtonElement>('[aria-label="Export Gadget"]')
-    expect(trigger?.disabled).toBe(true)
-    expect(trigger?.closest('[data-tooltip]')?.getAttribute('data-tooltip')).toBe('Exporting to CSV')
+    expect(trigger().disabled).toBe(true)
+    expect(await tooltipText()).toBe('Exporting to CSV')
 
     await act(async () => {
       finishExport()
       await pendingExport
     })
 
-    expect(trigger?.disabled).toBe(false)
-    expect(trigger?.closest('[data-tooltip]')?.getAttribute('data-tooltip')).toBe('Export Gadget')
+    expect(trigger().disabled).toBe(false)
+    expect(await tooltipText()).toBe('Export Gadget')
   })
 
   it('shows an empty state without hiding or disabling the export button', async () => {
@@ -187,14 +224,13 @@ describe('GadgetExportMenu', () => {
     await act(async () => {
       root.render(<GadgetExportMenu gadget={client} gadgetTitle="Report" />)
     })
-    const trigger = container.querySelector<HTMLButtonElement>('[aria-label="Export Gadget"]')
-    expect(trigger).not.toBeNull()
-    expect(trigger?.disabled).toBe(false)
+    expect(document.body.querySelector('[aria-label="Export Gadget"]')).not.toBeNull()
+    expect(trigger().disabled).toBe(false)
 
-    await act(async () => { button('open export menu')?.click() })
+    await open()
 
-    expect(container.textContent).toContain('This Gadget does not support exports.')
-    expect(container.querySelector('[aria-label="Export Gadget"]')).not.toBeNull()
+    expect(document.body.textContent).toContain('This Gadget does not support exports.')
+    expect(document.body.querySelector('[aria-label="Export Gadget"]')).not.toBeNull()
   })
 
   it('does not render the control without a selected Gadget', async () => {
@@ -220,14 +256,14 @@ describe('GadgetExportMenu', () => {
     await act(async () => {
       root.render(<GadgetExportMenu gadget={client} gadgetTitle="Report" />)
     })
-    await act(async () => { button('open export menu')?.click() })
+    await open()
 
-    expect(container.querySelector('[role="status"][aria-label="Loading export formats"]')).not.toBeNull()
-    await act(async () => { button('close export menu')?.click() })
-    expect(container.querySelector('[role="status"][aria-label="Loading export formats"]')).toBeNull()
+    expect(document.body.querySelector('[role="status"][aria-label="Loading export formats"]')).not.toBeNull()
+    await close()
+    expect(document.body.querySelector('[role="status"][aria-label="Loading export formats"]')).toBeNull()
 
-    await act(async () => { button('open export menu')?.click() })
-    expect(container.textContent).toContain('Second sheet')
+    await open()
+    expect(document.body.textContent).toContain('Second sheet')
 
     await act(async () => {
       resolveFirst([{
@@ -237,8 +273,8 @@ describe('GadgetExportMenu', () => {
       await first
     })
 
-    expect(container.textContent).not.toContain('First sheet')
-    expect(container.textContent).toContain('Second sheet')
+    expect(document.body.textContent).not.toContain('First sheet')
+    expect(document.body.textContent).toContain('Second sheet')
     expect(getExportFormats).toHaveBeenCalledTimes(2)
   })
 
@@ -257,12 +293,12 @@ describe('GadgetExportMenu', () => {
       await act(async () => {
         root.render(<GadgetExportMenu gadget={client} gadgetTitle="Report" />)
       })
-      await act(async () => { button('open export menu')?.click() })
+      await open()
 
-      expect(container.textContent).toContain('Export formats could not be loaded.')
+      expect(document.body.textContent).toContain('Export formats could not be loaded.')
       expect(button('Try again')).toBeDefined()
 
-      await act(async () => { button('Try again')?.click() })
+      await act(async () => { realClick(button('Try again')!) })
 
       expect(button('HTML')).toBeDefined()
       expect(getExportFormats).toHaveBeenCalledTimes(2)

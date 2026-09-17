@@ -17,7 +17,9 @@ export default function GadgetExportMenu({ gadget, gadgetTitle, chatId }: Props)
   const [formats, setFormats] = useState<GadgetExportFormat[] | null>(null)
   const [loading, setLoading] = useState(false)
   const [loadFailed, setLoadFailed] = useState(false)
-  const [exportingId, setExportingId] = useState<string | null>(null)
+  // The full format, not just its id: the menu closes (and clears `formats`) as soon as an item is
+  // picked, so the label for "Exporting to X" must survive independently of the format list.
+  const [exportingFormat, setExportingFormat] = useState<GadgetExportFormat | null>(null)
   const formatRequest = useRef(0)
   const toasts = useKumoToastManager()
 
@@ -58,9 +60,9 @@ export default function GadgetExportMenu({ gadget, gadgetTitle, chatId }: Props)
   }
 
   const download = async (format: GadgetExportFormat) => {
-    if (!gadget || exportingId !== null) return
+    if (!gadget || exportingFormat !== null) return
 
-    setExportingId(format.id)
+    setExportingFormat(format)
     try {
       await saveStreamToFile(
         () => gadget.export(format.id, chatId),
@@ -75,13 +77,12 @@ export default function GadgetExportMenu({ gadget, gadgetTitle, chatId }: Props)
       console.error(`Failed to export Gadget as ${format.label}:`, error)
       toasts.add({ title: `Failed to export ${format.label}`, variant: 'error' })
     } finally {
-      setExportingId(null)
+      setExportingFormat(null)
     }
   }
 
   if (!gadget) return null
 
-  const exportingFormat = formats?.find(format => format.id === exportingId)
   const tooltip = exportingFormat ? `Exporting to ${exportingFormat.label}` : 'Export Gadget'
 
   return (
@@ -92,7 +93,7 @@ export default function GadgetExportMenu({ gadget, gadgetTitle, chatId }: Props)
             render={(
               <WorkshopIconButton
                 aria-label="Export Gadget"
-                disabled={exportingId !== null}
+                disabled={exportingFormat !== null}
               >
                 <DownloadSimple size={17} />
               </WorkshopIconButton>
@@ -136,7 +137,7 @@ export default function GadgetExportMenu({ gadget, gadgetTitle, chatId }: Props)
             ))}
           </DropdownMenu.Content>
         </DropdownMenu>
-        {exportingId !== null && (
+        {exportingFormat !== null && (
           <span className="pointer-events-none absolute bottom-0 left-1 right-1 h-0.5 overflow-hidden rounded-full bg-kumo-fill">
             <span className="absolute inset-y-0 w-1/3 bg-kumo-brand animate-[thinking_1.5s_ease-in-out_infinite]" />
           </span>
