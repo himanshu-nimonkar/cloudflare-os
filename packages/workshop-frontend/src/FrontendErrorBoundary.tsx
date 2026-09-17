@@ -27,7 +27,11 @@ export default class FrontendErrorBoundary extends Component<Props, State> {
       <main className="mx-auto flex min-h-full max-w-lg flex-col items-center justify-center gap-4 px-6 text-center">
         <h1 className="text-xl font-semibold">Something went wrong</h1>
         <p className="text-sm text-kumo-subtle">Reload the Workshop to start again.</p>
-        <Button variant="primary" onClick={() => location.reload()}>
+        <Button
+          variant="primary"
+          onClick={() => location.reload()}
+          className="!bg-kumo-brand enabled:hover:!bg-kumo-brand-hover"
+        >
           Reload
         </Button>
       </main>

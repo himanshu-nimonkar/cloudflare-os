@@ -63,7 +63,11 @@ function RootComponent() {
     return (
       <div className="flex min-h-full items-center justify-center flex-col gap-4 bg-kumo-base p-6">
         <p className="text-sm text-kumo-danger">Authentication error: {error}</p>
-        <Button variant="primary" onClick={() => window.location.reload()}>
+        <Button
+          variant="primary"
+          onClick={() => window.location.reload()}
+          className="!bg-kumo-brand enabled:hover:!bg-kumo-brand-hover"
+        >
           Retry
         </Button>
       </div>

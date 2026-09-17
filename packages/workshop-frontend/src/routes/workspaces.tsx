@@ -26,7 +26,7 @@ function WorkspacesPage() {
         {/* "Create" just routes to Home (the new-workspace launcher) for now. */}
         <Link
           to="/"
-          className={`${buttonVariants({ variant: 'primary', size: 'base' })} !h-11 shrink-0 sm:!h-9`}
+          className={`${buttonVariants({ variant: 'primary', size: 'base' })} !h-11 shrink-0 !bg-kumo-brand enabled:hover:!bg-kumo-brand-hover sm:!h-9`}
         >
           <Plus size={14} weight="bold" />
           Create workspace
