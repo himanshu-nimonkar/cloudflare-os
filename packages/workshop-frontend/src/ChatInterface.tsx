@@ -1875,9 +1875,12 @@ function DiscardPendingChangesPopover({
           </p>
         </div>
         <div className="flex items-center justify-end gap-0.5 border-t border-kumo-line px-2 py-1.5">
+          {/* Kumo's ghost variant has no disabled guard on its own hover:bg-kumo-tint, so a
+              disabled button still shows hover feedback unless it's suppressed here too. */}
           <Button
             variant="ghost"
             size="sm"
+            className="disabled:hover:!bg-inherit"
             disabled={isDiscarding}
             onClick={() => onOpenChange(false)}
           >
@@ -1886,7 +1889,7 @@ function DiscardPendingChangesPopover({
           <Button
             variant="ghost"
             size="sm"
-            className="hover:!text-kumo-danger"
+            className="enabled:hover:!text-kumo-danger disabled:hover:!bg-inherit"
             disabled={disabled || isDiscarding}
             onClick={onConfirm}
             loading={isDiscarding}
