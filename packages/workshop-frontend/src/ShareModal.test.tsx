@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 /* eslint-disable react/react-in-jsx-scope */
 
-import { act, type ComponentProps, type ReactElement, type ReactNode } from 'react'
+import { act, createElement, isValidElement, type ComponentProps, type ComponentType, type ReactElement, type ReactNode } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
 import { afterAll, afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { RpcStub } from 'capnweb'
@@ -42,6 +42,13 @@ afterAll(() => {
   }
 })
 
+// Kumo's `icon` prop accepts either an already-built element or a bare Icon component (as
+// `icon={Link}` passes); mirror that so a test double doesn't choke on a raw component reference.
+function renderIcon(icon: unknown): ReactNode {
+  if (icon == null || isValidElement(icon)) return icon as ReactNode
+  return createElement(icon as ComponentType)
+}
+
 vi.mock('@cloudflare/kumo', () => {
   const Dialog = Object.assign(
     ({ children }: { children: ReactNode }) => <dialog open>{children}</dialog>,
@@ -69,9 +76,18 @@ vi.mock('@cloudflare/kumo', () => {
       children,
       icon,
       loading: _loading,
+      variant: _variant,
+      size: _size,
+      shape: _shape,
       ...props
-    }: ComponentProps<'button'> & { icon?: ReactNode; loading?: boolean }) => (
-      <button type="button" {...props}>{icon}{children}</button>
+    }: ComponentProps<'button'> & {
+      icon?: ReactNode
+      loading?: boolean
+      variant?: string
+      size?: string
+      shape?: string
+    }) => (
+      <button type="button" {...props}>{renderIcon(icon)}{children}</button>
     ),
     Checkbox: ({ label }: { label: ReactNode }) => <label>{label}</label>,
     Dialog,
@@ -81,10 +97,20 @@ vi.mock('@cloudflare/kumo', () => {
 })
 
 vi.mock('./components/WorkshopControls', () => ({
-  WorkshopButton: ({ children, ...props }: ComponentProps<'button'>) => (
-    <button type="button" {...props}>{children}</button>
+  WorkshopButton: ({
+    children,
+    icon,
+    tone: _tone,
+    ...props
+  }: ComponentProps<'button'> & { icon?: ReactNode; tone?: string }) => (
+    <button type="button" {...props}>{renderIcon(icon)}{children}</button>
   ),
-  WorkshopIconButton: ({ children, ...props }: ComponentProps<'button'>) => (
+  WorkshopIconButton: ({
+    children,
+    tone: _tone,
+    danger: _danger,
+    ...props
+  }: ComponentProps<'button'> & { tone?: string; danger?: boolean }) => (
     <button type="button" {...props}>{children}</button>
   ),
 }))
