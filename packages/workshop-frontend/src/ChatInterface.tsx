@@ -5530,6 +5530,7 @@ function ChatInterface({
                                     disabled={isAgentActive || mainlineMerge !== undefined}
                                     onClick={() => handleRevertChanges(entry.message.sequence)}
                                     title={discardLabel}
+                                    aria-label={discardLabel}
                                     icon={<ArrowUUpLeft size={15} />}
                                   />
                                 )}
@@ -5734,6 +5735,7 @@ function ChatInterface({
                                       className="text-kumo-inactive hover:!text-kumo-default"
                                       onClick={() => handleCopyMessage(msg.message)}
                                       title="Copy message"
+                                      aria-label="Copy message"
                                       icon={<Copy size={15} />}
                                     />
                                   )}
@@ -5751,6 +5753,7 @@ function ChatInterface({
                                         disabled={isAgentActive}
                                         onClick={() => handleRevertChanges(pendingChange.revertFrom)}
                                         title={label}
+                                        aria-label={label}
                                         icon={<ArrowUUpLeft size={15} />}
                                       />
                                     );
