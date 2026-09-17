@@ -399,7 +399,7 @@ export default function AdminPage() {
     return (
       <div className="mx-auto w-full max-w-[1040px] px-4 sm:px-8 py-16 text-center">
         <p className="text-sm text-kumo-danger">Something went wrong loading admin settings.</p>
-        <Button variant="ghost" onClick={() => window.location.reload()} className="!text-kumo-brand underline">
+        <Button variant="ghost" onClick={() => window.location.reload()} className="mt-2 !text-kumo-brand underline">
           Try again
         </Button>
       </div>

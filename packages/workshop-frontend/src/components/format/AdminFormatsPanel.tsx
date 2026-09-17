@@ -284,25 +284,17 @@ function FormatRow({
             open ? 'opacity-100' : 'opacity-0 group-hover:opacity-100 focus-within:opacity-100'
           }`}
         >
-          <Button
-            variant="ghost"
-            shape="square"
-            aria-label="Move up"
-            title="Move up"
+          <IconButton
+            label="Move up"
             disabled={busy || isFirst}
             onClick={() => onMove(-1)}
             icon={<ArrowUp size={13} />}
-            className="!h-7 !w-7 !text-kumo-subtle"
           />
-          <Button
-            variant="ghost"
-            shape="square"
-            aria-label="Move down"
-            title="Move down"
+          <IconButton
+            label="Move down"
             disabled={busy || isLast}
             onClick={() => onMove(1)}
             icon={<ArrowDown size={13} />}
-            className="!h-7 !w-7 !text-kumo-subtle"
           />
         </div>
 
@@ -441,6 +433,31 @@ function FormatRow({
         </div>
       )}
     </div>
+  )
+}
+
+function IconButton({
+  label,
+  disabled,
+  onClick,
+  icon,
+}: {
+  label: string
+  disabled?: boolean
+  onClick: () => void
+  icon: React.ReactNode
+}) {
+  return (
+    <Button
+      variant="ghost"
+      shape="square"
+      aria-label={label}
+      title={label}
+      disabled={disabled}
+      onClick={onClick}
+      icon={icon}
+      className="!h-7 !w-7 !text-kumo-subtle"
+    />
   )
 }
 
