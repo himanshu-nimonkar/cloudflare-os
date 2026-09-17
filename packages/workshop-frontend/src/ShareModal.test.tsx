@@ -64,6 +64,15 @@ vi.mock('@cloudflare/kumo', () => {
     },
   )
   return {
+    Badge: ({ children }: { children: ReactNode }) => <span>{children}</span>,
+    Button: ({
+      children,
+      icon,
+      loading: _loading,
+      ...props
+    }: ComponentProps<'button'> & { icon?: ReactNode; loading?: boolean }) => (
+      <button type="button" {...props}>{icon}{children}</button>
+    ),
     Checkbox: ({ label }: { label: ReactNode }) => <label>{label}</label>,
     Dialog,
     DropdownMenu,
