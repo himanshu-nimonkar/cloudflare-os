@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 /* eslint-disable react/react-in-jsx-scope */
 
-import { act, type ComponentProps, type ReactNode } from 'react'
+import { act } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
 import { afterEach, describe, expect, it, vi, type Mock } from 'vitest'
 import type { RpcStub } from 'capnweb'
@@ -16,37 +16,36 @@ import type { AccountDescription, SupportedResource, VendorDescription } from '@
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true
 
-vi.mock('@cloudflare/kumo', () => {
-  const Dialog = Object.assign(
-    ({ children }: { children: ReactNode }) => <div>{children}</div>,
-    {
-      Root: ({ children }: { children: ReactNode }) => <>{children}</>,
-      Title: ({ children }: { children: ReactNode }) => <h1>{children}</h1>,
-    },
-  )
-  const Select = Object.assign(
-    ({ children }: { children: ReactNode }) => <div data-testid="account-select">{children}</div>,
-    { Option: ({ children }: { children: ReactNode }) => <div>{children}</div> },
-  )
+// Kumo's Dialog and Select portal their content and measure/position it (Select is a listbox
+// popup); jsdom implements neither ResizeObserver nor pointer capture.
+vi.stubGlobal('ResizeObserver', class {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+})
+Element.prototype.hasPointerCapture ??= () => false
+Element.prototype.setPointerCapture ??= () => {}
+Element.prototype.releasePointerCapture ??= () => {}
+if (typeof PointerEvent === 'undefined') {
+  class PointerEventPolyfill extends MouseEvent {
+    pointerId: number
+    isPrimary: boolean
+    constructor(type: string, params: MouseEventInit & { pointerId?: number; isPrimary?: boolean } = {}) {
+      super(type, params)
+      this.pointerId = params.pointerId ?? 0
+      this.isPrimary = params.isPrimary ?? true
+    }
+  }
+  vi.stubGlobal('PointerEvent', PointerEventPolyfill)
+}
+
+vi.mock('@cloudflare/kumo', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@cloudflare/kumo')>()
   return {
-    Dialog,
-    Loader: () => <span>Loading</span>,
-    Select,
-    Text: ({ children }: { children: ReactNode }) => <p>{children}</p>,
-    Button: ({ children, loading, disabled, ...props }: ComponentProps<'button'> & { loading?: boolean }) => (
-      <button type="button" disabled={disabled || loading} {...props}>{children}</button>
-    ),
+    ...actual,
     useKumoToastManager: () => ({ add: vi.fn<(toast: unknown) => void>() }),
   }
 })
-
-vi.mock('./components/WorkshopControls', () => ({
-  WorkshopButton: ({ children, ...props }: ComponentProps<'button'>) => (
-    <button type="button" {...props}>{children}</button>
-  ),
-}))
-
-vi.mock('./components/Avatar', () => ({ default: () => <span data-testid="avatar" /> }))
 
 import ObserverConfigModal from './ObserverConfigModal'
 
@@ -171,14 +170,16 @@ describe('ObserverConfigModal account selection', () => {
       )
       await Promise.resolve()
     })
-    return container
+    // Dialog and Select portal their content outside `container`, so callers search the whole
+    // document rather than being scoped to the render root.
+    return document.body
   }
 
   it('shows a single matching account directly instead of putting it in a dropdown', async () => {
     const rendered = await render([account(1, 'dan@cloudflare.com')])
 
     expect(rendered.textContent).toContain('dan@cloudflare.com')
-    expect(rendered.querySelector('[data-testid="account-select"]')).toBeNull()
+    expect(rendered.querySelector('[role="combobox"][data-kumo-component="Select"]')).toBeNull()
   })
 
   it('disposes a pending account subscription on unmount', async () => {
@@ -203,7 +204,7 @@ describe('ObserverConfigModal account selection', () => {
       account(2, 'dan.personal@gmail.com'),
     ])
 
-    expect(rendered.querySelectorAll('[data-testid="account-select"]')).toHaveLength(1)
+    expect(rendered.querySelectorAll('[role="combobox"][data-kumo-component="Select"]')).toHaveLength(1)
   })
 
   it('requests the resource scope when connecting a new account', async () => {

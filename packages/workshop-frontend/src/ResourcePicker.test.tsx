@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 /* eslint-disable react/react-in-jsx-scope */
 
-import { act, type ReactNode } from 'react'
+import { act } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import type { RpcStub } from 'capnweb'
@@ -10,11 +10,13 @@ import ResourcePicker from './ResourcePicker'
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true
 
-vi.mock('@cloudflare/kumo', () => ({
-  Loader: () => <span>Loading</span>,
-  Tooltip: ({ children }: { children: ReactNode }) => children,
-  useKumoToastManager: () => ({ add: vi.fn<(toast: unknown) => void>() }),
-}))
+vi.mock('@cloudflare/kumo', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@cloudflare/kumo')>()
+  return {
+    ...actual,
+    useKumoToastManager: () => ({ add: vi.fn<(toast: unknown) => void>() }),
+  }
+})
 
 function deferred<T>() {
   let resolve!: (value: T) => void
