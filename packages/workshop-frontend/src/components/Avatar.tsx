@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { Avatar as AvatarPrimitive } from '@cloudflare/kumo/primitives/avatar'
 
 interface AvatarProps {
   /** Image URL to display */
@@ -24,28 +24,21 @@ interface AvatarProps {
 export default function Avatar(
   { src, background, size = 32, fallback, style, className = '' }: AvatarProps,
 ) {
-  const [imgError, setImgError] = useState(false)
-
   const baseClasses = `rounded-full flex items-center justify-center overflow-hidden flex-shrink-0 ${className}`
 
-  if (src && !imgError) {
-    return (
-      <img
-        src={src}
-        alt=""
-        onError={() => setImgError(true)}
-        className={baseClasses}
-        style={{ width: size, height: size, objectFit: 'cover', backgroundColor: background, ...style }}
-      />
-    )
-  }
-
   return (
-    <div
-      className={`${baseClasses} bg-kumo-tint text-kumo-subtle`}
-      style={{ width: size, height: size, fontSize: size * 0.4, ...style }}
-    >
-      {fallback}
-    </div>
+    <AvatarPrimitive.Root className={baseClasses} style={{ width: size, height: size, ...style }}>
+      {src && (
+        <AvatarPrimitive.Image
+          src={src}
+          alt=""
+          className="h-full w-full object-cover"
+          style={{ backgroundColor: background }}
+        />
+      )}
+      <AvatarPrimitive.Fallback className="flex h-full w-full items-center justify-center bg-kumo-tint text-kumo-subtle" style={{ fontSize: size * 0.4 }}>
+        {fallback}
+      </AvatarPrimitive.Fallback>
+    </AvatarPrimitive.Root>
   )
 }

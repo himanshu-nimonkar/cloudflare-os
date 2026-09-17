@@ -1,3 +1,5 @@
+import { Avatar as AvatarPrimitive } from '@cloudflare/kumo/primitives/avatar'
+
 export function GatekeeperIcon({
   vendorId,
   fallbackText,
@@ -23,25 +25,19 @@ export function GatekeeperIcon({
 }) {
   const fallback = fallbackText || vendorId || '?'
 
-  if (logoUrl) {
-    return (
-      <div
-        className={`flex shrink-0 items-center justify-center overflow-hidden ${className}`}
-        style={{ backgroundColor: color ?? 'var(--color-kumo-tint)' }}
-      >
-        <img src={logoUrl} alt="" className="h-full w-full object-contain p-1" />
-      </div>
-    )
-  }
-
   return (
-    <div
-      className={`flex shrink-0 items-center justify-center ${className}`}
-      style={{ backgroundColor: 'var(--color-kumo-tint)' }}
+    <AvatarPrimitive.Root
+      className={`flex shrink-0 items-center justify-center overflow-hidden ${className}`}
+      style={{ backgroundColor: logoUrl ? (color ?? 'var(--color-kumo-tint)') : 'var(--color-kumo-tint)' }}
     >
-      <span className="font-medium text-kumo-strong" style={{ fontSize: Math.max(11, Math.round(size * 0.7)) }}>
-        {fallback[0].toUpperCase()}
-      </span>
-    </div>
+      {logoUrl && (
+        <AvatarPrimitive.Image src={logoUrl} alt="" className="h-full w-full object-contain p-1" />
+      )}
+      <AvatarPrimitive.Fallback className="flex h-full w-full items-center justify-center">
+        <span className="font-medium text-kumo-strong" style={{ fontSize: Math.max(11, Math.round(size * 0.7)) }}>
+          {fallback[0].toUpperCase()}
+        </span>
+      </AvatarPrimitive.Fallback>
+    </AvatarPrimitive.Root>
   )
 }
