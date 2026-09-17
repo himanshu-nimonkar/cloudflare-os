@@ -1,3 +1,4 @@
+import { Button } from "@cloudflare/kumo";
 import { File as FileIcon, X } from "@phosphor-icons/react";
 import type { ComposerAttachment } from "./useComposerAttachments";
 
@@ -38,15 +39,16 @@ export const ComposerAttachmentTray = ({
               Failed
             </div>
           )}
-          <button
-            type="button"
+          <Button
+            variant="ghost"
+            shape="circle"
+            size="xs"
             aria-label="Remove attachment"
             disabled={disabled}
             onClick={() => onRemove(attachment.id)}
-            className="absolute right-0.5 top-0.5 flex h-4 w-4 cursor-pointer items-center justify-center rounded-full bg-black/55 text-white hover:bg-black/75 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/80 disabled:cursor-not-allowed disabled:opacity-50"
-          >
-            <X size={10} weight="bold" />
-          </button>
+            icon={<X size={10} weight="bold" />}
+            className="!absolute !right-0.5 !top-0.5 !h-4 !w-4 !bg-black/55 !text-white hover:!bg-black/75 focus-visible:!ring-white/80"
+          />
         </div>
       ))}
     </div>

@@ -1,4 +1,4 @@
-import { Tooltip } from "@cloudflare/kumo";
+import { Button, Tooltip } from "@cloudflare/kumo";
 import { X } from "@phosphor-icons/react";
 
 type CapturedConsoleLogsPromptProps = {
@@ -40,25 +40,26 @@ export const CapturedConsoleLogsPrompt = ({
           align="end"
           asChild
         >
-          <button
-            type="button"
+          <Button
+            variant="ghost"
             onClick={onAttach}
-            className="flex min-w-0 items-center gap-2 truncate text-left hover:text-kumo-default"
+            icon={<span className={`h-1.5 w-1.5 shrink-0 rounded-full ${dotClass}`} />}
+            className="!min-w-0 !justify-start !gap-2 truncate !px-0 !text-kumo-subtle hover:!text-kumo-default"
           >
-            <span className={`h-1.5 w-1.5 shrink-0 rounded-full ${dotClass}`} />
             <span className="truncate">
               Send {count} captured {logKind}{count !== 1 ? "s" : ""} to chat
             </span>
-          </button>
+          </Button>
         </Tooltip>
-        <button
-          type="button"
+        <Button
+          variant="ghost"
+          shape="circle"
+          size="xs"
           onClick={onDiscard}
-          className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full opacity-60 transition-opacity hover:bg-kumo-tint hover:opacity-100"
+          icon={<X size={10} />}
           aria-label="Discard captured logs"
-        >
-          <X size={10} />
-        </button>
+          className="!h-5 !w-5 !flex-shrink-0 opacity-60 hover:opacity-100"
+        />
       </div>
     </div>
   );
