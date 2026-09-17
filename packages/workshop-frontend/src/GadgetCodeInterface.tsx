@@ -1097,7 +1097,7 @@ export default function GadgetCodeInterface({
             variant="ghost"
             aria-label="Close files"
             onClick={() => setFileDrawerOpen(false)}
-            className="!absolute !inset-0 !z-20 !rounded-none !bg-black/25 hover:!bg-black/25 md:!hidden"
+            className="!absolute !inset-0 !z-20 !h-full !w-full !rounded-none !bg-black/25 hover:!bg-black/25 md:!hidden"
           />
         )}
         <div
