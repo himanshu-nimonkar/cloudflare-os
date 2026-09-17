@@ -8,7 +8,7 @@
 // plural and icon, and clearing an override falls back to it.
 
 import { useEffect, useMemo, useState } from 'react'
-import { Button, DropdownMenu, Input, Switch, useKumoToastManager } from '@cloudflare/kumo'
+import { Badge, Button, DropdownMenu, Input, Switch, useKumoToastManager } from '@cloudflare/kumo'
 import { ArrowDown, ArrowUp, CaretDown, CaretRight, Plus, Sparkle, Trash, Warning } from '@phosphor-icons/react'
 import type {
   AdminApi,
@@ -259,9 +259,9 @@ function FormatRow({
               <span className="truncate text-sm font-medium text-kumo-default">
                 {format.output ? `New ${format.output.noun}` : format.blueprintTitle || format.blueprintId}
               </span>
-              {format.bundled && <Badge>Bundled</Badge>}
-              {!format.enabled && !format.missing && <Badge>Off</Badge>}
-              {needsNaming && <Badge tone="warn">Needs a name</Badge>}
+              {format.bundled && <Badge variant="secondary">Bundled</Badge>}
+              {!format.enabled && !format.missing && <Badge variant="secondary">Off</Badge>}
+              {needsNaming && <Badge variant="error">Needs a name</Badge>}
             </span>
             <span className="mt-0.5 block truncate text-xs text-kumo-subtle">
               {format.missing
@@ -284,12 +284,18 @@ function FormatRow({
             open ? 'opacity-100' : 'opacity-0 group-hover:opacity-100 focus-within:opacity-100'
           }`}
         >
-          <IconButton label="Move up" disabled={busy || isFirst} onClick={() => onMove(-1)}>
-            <ArrowUp size={13} />
-          </IconButton>
-          <IconButton label="Move down" disabled={busy || isLast} onClick={() => onMove(1)}>
-            <ArrowDown size={13} />
-          </IconButton>
+          <IconButton
+            label="Move up"
+            disabled={busy || isFirst}
+            onClick={() => onMove(-1)}
+            icon={<ArrowUp size={13} />}
+          />
+          <IconButton
+            label="Move down"
+            disabled={busy || isLast}
+            onClick={() => onMove(1)}
+            icon={<ArrowDown size={13} />}
+          />
         </div>
 
         <Switch
@@ -430,6 +436,31 @@ function FormatRow({
   )
 }
 
+function IconButton({
+  label,
+  disabled,
+  onClick,
+  icon,
+}: {
+  label: string
+  disabled?: boolean
+  onClick: () => void
+  icon: React.ReactNode
+}) {
+  return (
+    <Button
+      variant="ghost"
+      shape="square"
+      aria-label={label}
+      title={label}
+      disabled={disabled}
+      onClick={onClick}
+      icon={icon}
+      className="!h-7 !w-7 !text-kumo-subtle"
+    />
+  )
+}
+
 function Fieldset({
   title,
   detail,
@@ -445,18 +476,6 @@ function Fieldset({
       <p className="mb-2 mt-0.5 text-[12px] leading-4 text-kumo-subtle">{detail}</p>
       {children}
     </div>
-  )
-}
-
-function Badge({ children, tone = 'neutral' }: { children: React.ReactNode; tone?: 'neutral' | 'warn' }) {
-  return (
-    <span
-      className={`shrink-0 rounded-full px-1.5 py-0.5 text-[10px] font-medium leading-none ${
-        tone === 'warn' ? 'bg-kumo-danger/10 text-kumo-danger' : 'bg-kumo-fill text-kumo-subtle'
-      }`}
-    >
-      {children}
-    </span>
   )
 }
 
@@ -534,14 +553,14 @@ function IconPicker({
       <DropdownMenu>
         <DropdownMenu.Trigger
           render={
-            <button
-              type="button"
+            <Button
+              variant="secondary"
+              shape="square"
               disabled={disabled}
               aria-label="Choose icon"
-              className="grid h-9 w-9 cursor-pointer place-items-center rounded-lg border border-kumo-line bg-kumo-base text-kumo-subtle transition-colors hover:text-kumo-default disabled:cursor-default"
-            >
-              <FormatGlyph output={selected && { ...GENERIC_OUTPUT, icon: selected }} size="lg" />
-            </button>
+              icon={<FormatGlyph output={selected && { ...GENERIC_OUTPUT, icon: selected }} size="lg" />}
+              className="!h-9 !w-9"
+            />
           }
         />
         <DropdownMenu.Content className={MENU_CONTENT}>
@@ -567,30 +586,5 @@ function IconPicker({
         </DropdownMenu.Content>
       </DropdownMenu>
     </label>
-  )
-}
-
-function IconButton({
-  label,
-  disabled,
-  onClick,
-  children,
-}: {
-  label: string
-  disabled?: boolean
-  onClick: () => void
-  children: React.ReactNode
-}) {
-  return (
-    <button
-      type="button"
-      aria-label={label}
-      title={label}
-      disabled={disabled}
-      onClick={onClick}
-      className="grid h-7 w-7 cursor-pointer place-items-center rounded-md text-kumo-subtle transition-colors hover:bg-kumo-fill hover:text-kumo-default disabled:cursor-default disabled:opacity-40"
-    >
-      {children}
-    </button>
   )
 }
