@@ -1,5 +1,5 @@
 import { useState, useEffect, useLayoutEffect, useRef, useCallback, useMemo } from 'react'
-import { Banner, Button, Empty, useKumoToastManager } from '@cloudflare/kumo'
+import { Banner, Empty, useKumoToastManager } from '@cloudflare/kumo'
 import { DownloadSimple, List, WarningCircle } from '@phosphor-icons/react'
 import { Overseer, WorkpieceId } from '@gadgets/workshop-shared/api'
 import type { CodeChange, FileChange, TextChange } from '@gadgets/workshop-shared/code-change'
@@ -1093,11 +1093,13 @@ export default function GadgetCodeInterface({
       )}
       <div className="relative flex min-h-0 flex-1">
         {fileDrawerOpen && (
-          <Button
-            variant="ghost"
+          // A plain click-catching overlay, not a styled control -- Kumo's Button fights its own
+          // defaults (padding, radius, hover, focus ring) for a scrim like this.
+          <button
+            type="button"
             aria-label="Close files"
             onClick={() => setFileDrawerOpen(false)}
-            className="!absolute !inset-0 !z-20 !h-full !w-full !rounded-none !bg-black/25 hover:!bg-black/25 md:!hidden"
+            className="absolute inset-0 z-20 bg-black/25 md:hidden"
           />
         )}
         <div

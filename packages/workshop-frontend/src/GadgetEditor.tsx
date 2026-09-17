@@ -768,6 +768,16 @@ export default function GadgetEditor() {
     return () => { cancelled = true; setHookedGadgetIds(NO_GADGETS) }
   }, [overseer, hookSignature, metadata !== null, isUseOnly])
   const pendingActionCount = pendingActions.length
+  // Shared by the desktop and mobile Tabs instances (and across renders): both read the same
+  // memoized array instead of each rebuilding its own copy of a list that rarely changes.
+  const memoizedActivityTabItems = useMemo(
+    () => activityTabItems(pendingActionCount),
+    [pendingActionCount],
+  )
+  const memoizedRightTabs = useMemo(
+    () => rightTabs(selectedGadgetSummary?.output),
+    [selectedGadgetSummary?.output],
+  )
 
   // Whether the *selected* gadget has code. When no gadget is selected, the code interface is
   // unmounted and raw `hasCode` can't update, but a gadget-less workspace has no code to show.
@@ -1748,7 +1758,7 @@ export default function GadgetEditor() {
                   size="sm"
                   value={activityView}
                   onValueChange={(value) => setActivityView(value as ActivityView)}
-                  tabs={activityTabItems(pendingActionCount)}
+                  tabs={memoizedActivityTabItems}
                 />
               ) : (
                 <Tabs
@@ -1756,7 +1766,7 @@ export default function GadgetEditor() {
                   size="sm"
                   value={activeTab}
                   onValueChange={(value) => handleTabSelect(value as RightTab)}
-                  tabs={rightTabs(selectedGadgetSummary?.output)}
+                  tabs={memoizedRightTabs}
                 />
               )}
 
@@ -1799,7 +1809,7 @@ export default function GadgetEditor() {
                   size="sm"
                   value={activityView}
                   onValueChange={(value) => setActivityView(value as ActivityView)}
-                  tabs={activityTabItems(pendingActionCount)}
+                  tabs={memoizedActivityTabItems}
                 />
               </div>
             )}
