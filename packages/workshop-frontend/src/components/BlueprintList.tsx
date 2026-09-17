@@ -10,7 +10,7 @@ import {
   UploadSimple,
 } from '@phosphor-icons/react'
 import { useCallback, useEffect, useRef, useState, type ChangeEvent } from 'react'
-import { DropdownMenu, useKumoToastManager } from '@cloudflare/kumo'
+import { DropdownMenu, InputGroup, useKumoToastManager } from '@cloudflare/kumo'
 import { useAuthenticatedApi } from '../AuthContext'
 import { MENU_CONTENT, MENU_ITEM, MENU_ITEM_DANGER } from './menuStyles'
 
@@ -260,16 +260,18 @@ export default function BlueprintList() {
           the empty state carries its own copies of the same two actions. */}
       {!loading && items.length > 0 && (
         <div className="mb-4 flex flex-col gap-2 px-3 sm:flex-row sm:items-center">
-          <div className="relative flex-1">
-            <MagnifyingGlass size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-kumo-inactive" />
-            <input
+          <InputGroup className="flex-1">
+            <InputGroup.Addon align="start">
+              <MagnifyingGlass size={16} />
+            </InputGroup.Addon>
+            <InputGroup.Input
+              aria-label="Search blueprints"
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search blueprints…"
-              className="h-9 w-full rounded-lg border border-kumo-line bg-kumo-base pl-9 pr-4 text-[13px] tracking-[-0.25px] text-kumo-default placeholder:text-kumo-inactive transition-[border-color,box-shadow] duration-150 ease-out focus:border-kumo-ring focus:outline-none focus:ring-[3px] focus:ring-kumo-ring/15"
             />
-          </div>
+          </InputGroup>
           {/* Grid, not flex: 1fr columns give the two buttons a matching width, where flex would
               size each to its own label. */}
           <div className="grid w-full grid-cols-2 gap-2 sm:w-auto sm:shrink-0">

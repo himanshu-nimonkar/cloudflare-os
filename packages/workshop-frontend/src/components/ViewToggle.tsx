@@ -1,3 +1,4 @@
+import { Tabs } from '@cloudflare/kumo'
 import { List, GridFour } from '@phosphor-icons/react'
 
 /**
@@ -11,28 +12,32 @@ export default function ViewToggle({
   view: 'grid' | 'list'
   onChange: (view: 'grid' | 'list') => void
 }) {
-  const options = [
-    { value: 'list' as const, Icon: List, label: 'List view' },
-    { value: 'grid' as const, Icon: GridFour, label: 'Grid view' },
-  ]
   return (
-    <div className="inline-flex shrink-0 items-center gap-0.5 rounded-lg border border-kumo-line bg-kumo-base p-0.5">
-      {options.map(({ value, Icon, label }) => (
-        <button
-          key={value}
-          type="button"
-          onClick={() => onChange(value)}
-          aria-label={label}
-          aria-pressed={view === value}
-          className={`grid h-8 w-8 cursor-pointer place-items-center rounded-md transition-colors ${
-            view === value
-              ? 'bg-kumo-fill text-kumo-strong'
-              : 'text-kumo-inactive hover:text-kumo-default'
-          }`}
-        >
-          <Icon size={16} weight={view === value ? 'bold' : 'regular'} />
-        </button>
-      ))}
-    </div>
+    <Tabs
+      variant="segmented"
+      size="sm"
+      value={view}
+      onValueChange={(value) => onChange(value as 'grid' | 'list')}
+      tabs={[
+        {
+          value: 'list',
+          label: (
+            <>
+              <List size={16} weight={view === 'list' ? 'bold' : 'regular'} />
+              <span className="sr-only">List view</span>
+            </>
+          ),
+        },
+        {
+          value: 'grid',
+          label: (
+            <>
+              <GridFour size={16} weight={view === 'grid' ? 'bold' : 'regular'} />
+              <span className="sr-only">Grid view</span>
+            </>
+          ),
+        },
+      ]}
+    />
   )
 }

@@ -1,7 +1,7 @@
 import { logRpcFailure } from '../rpcErrors'
 import { createFileRoute } from '@tanstack/react-router'
 import { useEffect, useMemo, useState } from 'react'
-import { useKumoToastManager } from '@cloudflare/kumo'
+import { InputGroup, useKumoToastManager } from '@cloudflare/kumo'
 import {
   MagnifyingGlass,
   ArrowsClockwise,
@@ -728,19 +728,18 @@ function ConnectorsPage() {
         </header>
 
         <div className="mb-6 flex items-center gap-3">
-          <div className="relative flex-1">
-            <MagnifyingGlass
-              size={16}
-              className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-kumo-inactive"
-            />
-            <input
+          <InputGroup className="flex-1">
+            <InputGroup.Addon align="start">
+              <MagnifyingGlass size={16} />
+            </InputGroup.Addon>
+            <InputGroup.Input
+              aria-label="Search gatekeepers"
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search gatekeepers…"
-              className="h-10 w-full rounded-lg border border-kumo-line bg-kumo-base pl-9 pr-4 text-[14px] leading-5 tracking-[-0.25px] text-kumo-default placeholder:text-kumo-inactive transition-[border-color,box-shadow] focus:border-kumo-ring focus:outline-none focus:ring-[3px] focus:ring-kumo-ring/15"
             />
-          </div>
+          </InputGroup>
           <ViewToggle view={view} onChange={setView} />
         </div>
 

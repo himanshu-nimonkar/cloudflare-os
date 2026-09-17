@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { useKumoToastManager } from "@cloudflare/kumo";
+import { InputGroup, useKumoToastManager } from "@cloudflare/kumo";
 import {
   Blueprint as BlueprintIcon,
   BookOpen,
@@ -93,19 +93,18 @@ export default function BlueprintsPage() {
         <span className="text-[12px] font-medium uppercase tracking-[0.08em] text-kumo-inactive">
           Featured
         </span>
-        <div className="relative min-w-0 flex-1 sm:w-64 sm:flex-none">
-          <MagnifyingGlass
-            size={16}
-            className="absolute left-3 top-1/2 -translate-y-1/2 text-kumo-inactive"
-          />
-          <input
+        <InputGroup className="min-w-0 flex-1 sm:w-64 sm:flex-none">
+          <InputGroup.Addon align="start">
+            <MagnifyingGlass size={16} />
+          </InputGroup.Addon>
+          <InputGroup.Input
+            aria-label="Search blueprints"
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
             placeholder="Search blueprints…"
-            className="h-10 w-full rounded-lg border border-kumo-line bg-kumo-base pl-9 pr-4 text-[16px] text-kumo-default placeholder:text-kumo-inactive transition-[border-color,box-shadow] duration-150 ease-out focus:border-kumo-ring focus:outline-none focus:ring-[3px] focus:ring-kumo-ring/15 sm:h-9 sm:text-[13px]"
           />
-        </div>
+        </InputGroup>
       </div>
 
       <div className="chat-panel min-h-0 flex-1 overflow-y-auto pb-8 pt-1">
