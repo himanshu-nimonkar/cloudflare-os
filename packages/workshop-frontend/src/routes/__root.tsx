@@ -1,7 +1,7 @@
 import { logRpcFailure } from '../rpcErrors'
 import { useState, useEffect } from 'react'
 import { createRootRoute, Outlet, useRouterState } from '@tanstack/react-router'
-import { TooltipProvider, Toasty } from '@cloudflare/kumo'
+import { Button, Loader, TooltipProvider, Toasty } from '@cloudflare/kumo'
 import { RpcStub } from 'capnweb'
 import { AuthenticatedApi } from '@gadgets/workshop-shared/api'
 import { useRpcStub, useConnectionLost } from '../RpcContext'
@@ -52,7 +52,7 @@ function RootComponent() {
   if (isLoading && !standalone) {
     return (
       <div className="flex min-h-full items-center justify-center flex-col gap-4 bg-kumo-base">
-        <div className="w-8 h-8 border-2 border-kumo-brand border-t-transparent rounded-full animate-spin" />
+        <Loader size="lg" />
         <p className="text-sm text-kumo-subtle">{connectionLost ? 'Waiting for server…' : 'Loading...'}</p>
       </div>
     )
@@ -63,12 +63,9 @@ function RootComponent() {
     return (
       <div className="flex min-h-full items-center justify-center flex-col gap-4 bg-kumo-base p-6">
         <p className="text-sm text-kumo-danger">Authentication error: {error}</p>
-        <button
-          onClick={() => window.location.reload()}
-          className="px-4 py-2 text-sm font-medium text-kumo-inverse bg-kumo-brand rounded-lg hover:bg-kumo-brand-hover transition-colors"
-        >
+        <Button variant="primary" onClick={() => window.location.reload()}>
           Retry
-        </button>
+        </Button>
       </div>
     )
   }
@@ -77,7 +74,7 @@ function RootComponent() {
   if (!isAuthenticated && CF_ACCESS_MODE && !standalone) {
     return (
       <div className="flex min-h-full items-center justify-center flex-col gap-4 bg-kumo-base">
-        <div className="w-8 h-8 border-2 border-kumo-brand border-t-transparent rounded-full animate-spin" />
+        <Loader size="lg" />
         <p className="text-sm text-kumo-subtle">Authenticating...</p>
       </div>
     )
@@ -156,7 +153,7 @@ function AuthenticatedShell({
   if (onboardingNeeded === null) {
     return (
       <div className="flex min-h-full items-center justify-center flex-col gap-4 bg-kumo-base">
-        <div className="w-8 h-8 border-2 border-kumo-brand border-t-transparent rounded-full animate-spin" />
+        <Loader size="lg" />
       </div>
     )
   }

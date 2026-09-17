@@ -1,3 +1,5 @@
+import { Badge } from '@cloudflare/kumo'
+
 /**
  * "Reconnecting…" pill for a fixed-height chrome strip (the workspace editor's top bar, the app
  * shell's top bar). Deliberately an inline chip rather than a full-width banner: a banner inserted
@@ -6,11 +8,11 @@
  */
 export default function ReconnectingChip() {
   return (
-    <span
-      role="status"
-      className="text-xs text-kumo-warning px-2 py-0.5 rounded-full bg-kumo-warning-tint border border-kumo-warning/20"
-    >
-      Reconnecting…
+    // Badge doesn't forward arbitrary props (e.g. role), so the a11y status role wraps it.
+    <span role="status">
+      <Badge variant="warning" className="border border-kumo-warning/20">
+        Reconnecting…
+      </Badge>
     </span>
   )
 }

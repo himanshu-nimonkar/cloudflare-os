@@ -1,4 +1,5 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
+import { buttonVariants } from '@cloudflare/kumo'
 import { Plus } from '@phosphor-icons/react'
 import GadgetList from '../components/GadgetList'
 import { useDocumentTitle } from '../useDocumentTitle'
@@ -25,7 +26,7 @@ function WorkspacesPage() {
         {/* "Create" just routes to Home (the new-workspace launcher) for now. */}
         <Link
           to="/"
-          className="press inline-flex h-11 shrink-0 cursor-pointer items-center justify-center gap-1.5 rounded-lg bg-kumo-brand px-3.5 text-[14px] font-medium text-white transition-colors hover:bg-kumo-brand-hover sm:h-9 sm:text-[13px]"
+          className={`${buttonVariants({ variant: 'primary', size: 'base' })} !h-11 shrink-0 sm:!h-9`}
         >
           <Plus size={14} weight="bold" />
           Create workspace

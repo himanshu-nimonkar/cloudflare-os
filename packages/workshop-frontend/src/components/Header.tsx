@@ -1,4 +1,5 @@
 import { Link } from '@tanstack/react-router'
+import { Button } from '@cloudflare/kumo'
 import { Hexagon, List, X } from '@phosphor-icons/react'
 import { useOptionalAuthenticatedApi } from '../AuthContext'
 import { useGatekeeperApps } from '../useGatekeeperApps'
@@ -104,12 +105,14 @@ export default function Header() {
 
           {/* Mobile hamburger button */}
           <div className="sm:hidden">
-            <button
+            <Button
+              variant="ghost"
+              shape="square"
+              aria-label={mobileMenuOpen ? 'Close menu' : 'Open menu'}
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="w-8 h-8 rounded-md flex items-center justify-center hover:bg-kumo-tint transition-colors text-kumo-default"
-            >
-              {mobileMenuOpen ? <X size={20} /> : <List size={20} />}
-            </button>
+              icon={mobileMenuOpen ? <X size={20} /> : <List size={20} />}
+              className="!h-8 !w-8 !text-kumo-default"
+            />
           </div>
         </div>
       </div>
@@ -187,12 +190,13 @@ export default function Header() {
                     Admin
                   </Link>
                 )}
-                <button
+                <Button
+                  variant="ghost"
                   onClick={() => { closeMobileMenu(); auth.logout() }}
-                  className="text-left text-sm px-3 py-1.5 rounded-md text-kumo-danger hover:bg-kumo-tint transition-colors"
+                  className="!w-full !justify-start !text-kumo-danger"
                 >
                   Sign out
-                </button>
+                </Button>
               </>
             )}
           </nav>

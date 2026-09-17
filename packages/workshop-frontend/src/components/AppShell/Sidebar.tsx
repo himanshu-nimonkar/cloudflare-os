@@ -1,4 +1,5 @@
 import { Link } from '@tanstack/react-router'
+import { Button } from '@cloudflare/kumo'
 import {
   Blueprint,
   BookOpen,
@@ -77,39 +78,39 @@ export default function Sidebar({
         </Link>
         {!collapsed && (
           <div className="flex items-center gap-0.5">
-            <button
-              type="button"
+            <Button
+              variant="ghost"
+              shape="square"
               onClick={() => openCommandPalette()}
               aria-label="Search"
               title="Search (⌘K)"
-              className="press flex h-7 w-7 cursor-pointer items-center justify-center rounded-md text-kumo-inactive transition-colors hover:bg-kumo-tint hover:text-kumo-default"
-            >
-              <MagnifyingGlass size={15} />
-            </button>
-            <button
-              type="button"
+              icon={<MagnifyingGlass size={15} />}
+              className="!h-7 !w-7 !text-kumo-inactive hover:!text-kumo-default"
+            />
+            <Button
+              variant="ghost"
+              shape="square"
               onClick={onToggleCollapsed}
               aria-label="Collapse sidebar"
               title="Collapse sidebar"
-              className="flex h-7 w-7 cursor-pointer items-center justify-center rounded-md text-kumo-inactive transition-colors hover:bg-kumo-tint hover:text-kumo-default"
-            >
-              <SidebarSimple size={15} />
-            </button>
+              icon={<SidebarSimple size={15} />}
+              className="!h-7 !w-7 !text-kumo-inactive hover:!text-kumo-default"
+            />
           </div>
         )}
       </div>
 
       {/* Expand affordance when collapsed — placed just under the logo for discoverability. */}
       {collapsed && (
-        <button
-          type="button"
+        <Button
+          variant="ghost"
+          shape="square"
           onClick={onToggleCollapsed}
           aria-label="Expand sidebar"
           title="Expand sidebar"
-          className="mx-auto mt-2 flex h-7 w-7 shrink-0 cursor-pointer items-center justify-center rounded-md text-kumo-inactive transition-colors hover:bg-kumo-tint hover:text-kumo-default"
-        >
-          <SidebarSimple size={15} className="rotate-180" />
-        </button>
+          icon={<SidebarSimple size={15} className="rotate-180" />}
+          className="!mx-auto !mt-2 !h-7 !w-7 !shrink-0 !text-kumo-inactive hover:!text-kumo-default"
+        />
       )}
 
       <SidebarWorkspacesProvider>

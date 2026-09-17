@@ -17,7 +17,7 @@ import {
   Star,
 } from '@phosphor-icons/react'
 import { openCommandPalette } from './commandPaletteBus'
-import { useKumoToastManager } from '@cloudflare/kumo'
+import { Button, Collapsible, useKumoToastManager } from '@cloudflare/kumo'
 import type { RpcStub } from 'capnweb'
 import {
   GadgetMetadataWithTimestamps,
@@ -273,15 +273,15 @@ export function SidebarWorkspacesTools({ collapsed = false }: { collapsed?: bool
 
   return (
     <div className="flex flex-col items-center px-2">
-      <button
-        type="button"
+      <Button
+        variant="ghost"
+        shape="square"
         onClick={() => openCommandPalette()}
         aria-label="Search"
         title="Search (⌘K)"
-        className="press flex h-9 w-9 cursor-pointer items-center justify-center rounded-lg text-kumo-subtle transition-colors hover:bg-kumo-tint hover:text-kumo-default"
-      >
-        <MagnifyingGlass size={15} />
-      </button>
+        icon={<MagnifyingGlass size={15} />}
+        className="!h-9 !w-9 !text-kumo-subtle hover:!text-kumo-default"
+      />
     </div>
   )
 }
@@ -420,12 +420,8 @@ function SidebarSection({
   children: ReactNode
 }) {
   return (
-    <div className="mt-3 flex flex-col px-2">
-      <button
-        type="button"
-        onClick={onToggle}
-        className="flex h-6 cursor-pointer items-center gap-1 px-1.5 text-[11px] font-medium uppercase tracking-[0.06em] text-kumo-inactive transition-colors hover:text-kumo-subtle"
-      >
+    <Collapsible.Root open={open} onOpenChange={() => onToggle()} className="mt-3 flex flex-col px-2">
+      <Collapsible.Trigger className="flex h-6 cursor-pointer items-center gap-1 px-1.5 text-[11px] font-medium uppercase tracking-[0.06em] text-kumo-inactive transition-colors hover:text-kumo-subtle">
         <CaretDown
           size={10}
           weight="bold"
@@ -434,8 +430,8 @@ function SidebarSection({
         {icon}
         <span>{label}</span>
         {count !== undefined && <span className="ml-1 text-kumo-inactive">{count}</span>}
-      </button>
-      {open && <div className="mt-0.5">{children}</div>}
-    </div>
+      </Collapsible.Trigger>
+      <Collapsible.Panel className="mt-0.5">{children}</Collapsible.Panel>
+    </Collapsible.Root>
   )
 }
