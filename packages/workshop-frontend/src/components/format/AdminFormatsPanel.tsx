@@ -288,6 +288,7 @@ function FormatRow({
             variant="ghost"
             shape="square"
             aria-label="Move up"
+            title="Move up"
             disabled={busy || isFirst}
             onClick={() => onMove(-1)}
             icon={<ArrowUp size={13} />}
@@ -297,6 +298,7 @@ function FormatRow({
             variant="ghost"
             shape="square"
             aria-label="Move down"
+            title="Move down"
             disabled={busy || isLast}
             onClick={() => onMove(1)}
             icon={<ArrowDown size={13} />}
