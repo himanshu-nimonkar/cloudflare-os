@@ -2,6 +2,7 @@ import { useNavigate } from '@tanstack/react-router'
 import { DropdownMenu } from '@cloudflare/kumo'
 import { useAuthenticatedApi } from '../AuthContext'
 import { useAvatar } from '../useAvatar'
+import Avatar from './Avatar'
 import { MENU_CONTENT, MENU_ITEM, MENU_ITEM_DANGER, MENU_POSITIONER_STYLE } from './menuStyles'
 
 export default function UserMenu() {
@@ -23,11 +24,11 @@ export default function UserMenu() {
             title="Open profile menu"
             aria-label="Open profile menu"
           >
-            {avatarUrl ? (
-              <img src={avatarUrl} alt="" className="w-full h-full object-cover" />
-            ) : (
-              <span className="text-xs font-medium text-kumo-strong">{initials}</span>
-            )}
+            <Avatar
+              src={avatarUrl ?? undefined}
+              fallback={<span className="text-xs font-medium text-kumo-strong">{initials}</span>}
+              className="!h-full !w-full"
+            />
           </button>
         }
       />
