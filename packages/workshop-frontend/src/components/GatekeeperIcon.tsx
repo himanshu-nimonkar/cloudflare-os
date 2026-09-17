@@ -28,10 +28,15 @@ export function GatekeeperIcon({
   return (
     <AvatarPrimitive.Root
       className={`flex shrink-0 items-center justify-center overflow-hidden ${className}`}
-      style={{ backgroundColor: logoUrl ? (color ?? 'var(--color-kumo-tint)') : 'var(--color-kumo-tint)' }}
+      style={{ backgroundColor: 'var(--color-kumo-tint)' }}
     >
       {logoUrl && (
-        <AvatarPrimitive.Image src={logoUrl} alt="" className="h-full w-full object-contain p-1" />
+        <AvatarPrimitive.Image
+          src={logoUrl}
+          alt=""
+          className="h-full w-full object-contain p-1"
+          style={{ backgroundColor: color }}
+        />
       )}
       <AvatarPrimitive.Fallback className="flex h-full w-full items-center justify-center">
         <span className="font-medium text-kumo-strong" style={{ fontSize: Math.max(11, Math.round(size * 0.7)) }}>
