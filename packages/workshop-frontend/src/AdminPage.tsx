@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef, type ChangeEvent } from 'react'
 import { RpcStub } from 'capnweb'
-import { Switch, Textarea, Input, Button, Tabs, useKumoToastManager } from '@cloudflare/kumo'
+import { Badge, Switch, Textarea, Input, Button, Tabs, useKumoToastManager } from '@cloudflare/kumo'
 import { Hexagon, MagnifyingGlass, ShieldWarning, UserPlus } from '@phosphor-icons/react'
 import { useAuthenticatedApi } from './AuthContext'
 import { AdminApi, AdminFormat, AdminResourceVendor, AmbientGatekeeperMode, MAX_INSTANCE_INSTRUCTIONS_LENGTH, MAX_ANNOUNCEMENT_LENGTH, MAX_SITE_NAME_LENGTH, DEFAULT_SITE_NAME, BannerColor, BANNER_COLORS, DEFAULT_BANNER_COLOR } from '@gadgets/workshop-shared/api'
@@ -399,9 +399,9 @@ export default function AdminPage() {
     return (
       <div className="mx-auto w-full max-w-[1040px] px-4 sm:px-8 py-16 text-center">
         <p className="text-sm text-kumo-danger">Something went wrong loading admin settings.</p>
-        <button onClick={() => window.location.reload()} className="text-kumo-brand mt-2 text-sm underline">
+        <Button variant="ghost" onClick={() => window.location.reload()} className="!text-kumo-brand underline">
           Try again
-        </button>
+        </Button>
       </div>
     )
   }
@@ -877,9 +877,7 @@ export default function AdminPage() {
                       <h3 className={`flex-1 text-sm font-semibold ${mode === 'disabled' ? 'text-kumo-subtle' : 'text-kumo-default'}`}>
                         {vendor.displayName}
                       </h3>
-                      <span className="text-[10px] font-medium px-1.5 py-0.5 rounded-md bg-kumo-tint text-kumo-subtle border border-kumo-line">
-                        auto-provisioned
-                      </span>
+                      <Badge variant="secondary">auto-provisioned</Badge>
                     </div>
                     <div className="flex gap-2 px-3 py-1">
                       {options.map((opt) => (
@@ -930,9 +928,7 @@ export default function AdminPage() {
                   <h3 className={`flex-1 text-sm font-semibold ${vendor.enabled ? 'text-kumo-default' : 'text-kumo-subtle'}`}>
                     {vendor.displayName}
                     {!vendor.enabled && (
-                      <span className="ml-2 text-[10px] font-medium px-1.5 py-0.5 rounded-md bg-kumo-tint text-kumo-subtle border border-kumo-line">
-                        disabled
-                      </span>
+                      <Badge variant="secondary" className="ml-2">disabled</Badge>
                     )}
                   </h3>
                   <span className="text-xs text-kumo-subtle">
