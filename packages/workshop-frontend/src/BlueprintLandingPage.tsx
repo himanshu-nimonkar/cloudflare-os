@@ -832,7 +832,7 @@ export default function BlueprintLandingPage({ rpcStub }: Props) {
                   loading={creating}
                   disabled={createDisabled}
                   onClick={handleStartConfigure}
-                  className="!w-full"
+                  className="!w-full !bg-kumo-brand enabled:hover:!bg-kumo-brand-hover"
                 >
                   {creating ? 'Creating...' : primaryActionLabel}
                 </Button>
