@@ -15,9 +15,11 @@ import {
 } from "react";
 import { reportIssue } from './errorReporting'
 import {
+  Button,
   Dialog,
   DropdownMenu,
   Popover,
+  Tabs,
   Tooltip,
   useKumoToastManager,
 } from "@cloudflare/kumo";
@@ -1082,15 +1084,16 @@ function CodeBlock({ children, ...props }: ComponentPropsWithoutRef<"pre">) {
   return (
     <div className={styles.codeBlock}>
       <pre {...props}>{children}</pre>
-      <button
-        type="button"
+      <Button
+        variant="secondary"
+        shape="square"
+        size="sm"
         className={styles.codeCopyButton}
         onClick={() => void copyToClipboard(code)}
         aria-label="Copy code"
         title="Copy code"
-      >
-        <ClipboardIcon size={16} />
-      </button>
+        icon={ClipboardIcon}
+      />
     </div>
   );
 }
@@ -1212,78 +1215,37 @@ const AttachmentPreviewModal = memo(function AttachmentPreviewModal(
     onDownload,
   }: AttachmentPreviewModalProps,
 ) {
-  const containerRef = useRef<HTMLDivElement>(null);
   const isImage = (attachment?.mimeType ?? "").startsWith("image/");
   const objectUrl = useAttachmentObjectUrl(
     isImage ? attachment?.content : undefined, attachment?.mimeType ?? "");
-
-  // Dialog keyboard handling: Escape closes, Tab stays trapped, focus restores on close.
-  useEffect(() => {
-    if (!attachment) return;
-    const previouslyFocused = document.activeElement as HTMLElement | null;
-    const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") {
-        onClose();
-        return;
-      }
-      if (event.key === "Tab" && containerRef.current) {
-        const focusable = containerRef.current.querySelectorAll<HTMLElement>(
-          'button, [href], iframe, [tabindex]:not([tabindex="-1"])');
-        if (focusable.length === 0) return;
-        const first = focusable[0];
-        const last = focusable[focusable.length - 1];
-        if (event.shiftKey && document.activeElement === first) {
-          event.preventDefault();
-          last.focus();
-        } else if (!event.shiftKey && document.activeElement === last) {
-          event.preventDefault();
-          first.focus();
-        }
-      }
-    };
-    window.addEventListener("keydown", onKeyDown);
-    // Defer to after paint so the close button exists.
-    const raf = requestAnimationFrame(() => {
-      containerRef.current?.querySelector<HTMLElement>("button")?.focus();
-    });
-    return () => {
-      window.removeEventListener("keydown", onKeyDown);
-      cancelAnimationFrame(raf);
-      previouslyFocused?.focus?.();
-    };
-  }, [attachment, onClose]);
 
   if (!attachment) return null;
 
   const sizeLabel = formatAttachmentSize(attachment.size);
   const title = attachment.name ?? "Attached file";
   const modalWidthClass = isImage
-    ? "w-[min(1120px,calc(100vw-32px))]"
-    : "w-[min(520px,calc(100vw-32px))]";
-  const modalSurfaceClass = "rounded-2xl border border-kumo-line/70 bg-kumo-base";
-  const modalPaddingClass = "p-3 sm:p-4";
+    ? "!w-[min(1120px,calc(100vw-32px))]"
+    : "!w-[min(520px,calc(100vw-32px))]";
 
   return (
-    <div
-      className="fixed inset-0 z-[2000] flex items-center justify-center bg-black/45 p-4 backdrop-blur-[1px]"
-      role="dialog"
-      aria-modal="true"
-      aria-label={`Preview ${title}`}
-      onMouseDown={(event) => {
-        if (event.target === event.currentTarget) onClose();
-      }}
-    >
-      <div ref={containerRef} className={`relative max-h-[calc(var(--app-height)-32px)] ${modalWidthClass} overflow-hidden ${modalSurfaceClass} p-0 shadow-[0_24px_80px_rgba(0,0,0,0.28)]`}>
-        <button
-          type="button"
-          onClick={onClose}
-          className="absolute right-3 top-3 z-10 flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border border-kumo-line bg-kumo-base/90 text-kumo-subtle shadow-[0_1px_2px_rgba(0,0,0,0.05)] backdrop-blur-sm transition-[background-color,color,transform] duration-150 ease-out hover:bg-kumo-base hover:text-kumo-default active:scale-[0.96]"
-          aria-label="Close preview"
-        >
-          <X size={18} />
-        </button>
+    <Dialog.Root open onOpenChange={(next) => { if (!next) onClose(); }}>
+      <Dialog className={`${modalWidthClass} overflow-hidden !rounded-2xl bg-kumo-base p-0`}>
+        <Dialog.Title className="sr-only">Preview {title}</Dialog.Title>
+        <Dialog.Close
+          render={(props) => (
+            <Button
+              {...props}
+              variant="secondary"
+              shape="circle"
+              size="sm"
+              className="absolute right-3 top-3 z-10 !h-8 !w-8 border-kumo-line bg-kumo-base/90 backdrop-blur-sm"
+              aria-label="Close preview"
+              icon={<X size={18} />}
+            />
+          )}
+        />
 
-        <div className={modalPaddingClass}>
+        <div className="p-3 sm:p-4">
           {isImage && objectUrl ? (
             <img
               src={objectUrl}
@@ -1302,20 +1264,21 @@ const AttachmentPreviewModal = memo(function AttachmentPreviewModal(
                 </div>
                 <div className="text-[12px] leading-5 text-kumo-inactive">This file can’t be previewed here.</div>
                 {onDownload && (
-                  <button
-                    type="button"
+                  <Button
+                    variant="secondary"
+                    size="sm"
+                    className="mt-1"
                     onClick={() => onDownload(attachment)}
-                    className="mt-1 inline-flex cursor-pointer items-center gap-1.5 rounded-lg border border-kumo-line/70 bg-kumo-base px-3 py-1.5 text-[12px] font-medium text-kumo-default transition-colors hover:bg-kumo-tint/40"
                   >
                     Download
-                  </button>
+                  </Button>
                 )}
               </div>
             </div>
           )}
         </div>
-      </div>
-    </div>
+      </Dialog>
+    </Dialog.Root>
   );
 });
 
@@ -1886,15 +1849,11 @@ function DiscardPendingChangesPopover({
   return (
     <Popover open={open} onOpenChange={onOpenChange}>
       <Popover.Trigger
-        render={
-          <button
-            type="button"
-            disabled={disabled}
-            className="inline-flex h-[30px] cursor-pointer items-center justify-center rounded-md border border-kumo-fill bg-kumo-base px-2.5 text-[12px] font-medium leading-[18px] tracking-[-0.25px] text-kumo-default transition-colors enabled:hover:bg-kumo-tint focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-kumo-ring disabled:cursor-not-allowed disabled:opacity-40"
-          >
+        render={(props) => (
+          <Button {...props} variant="secondary" size="sm" disabled={disabled}>
             Discard…
-          </button>
-        }
+          </Button>
+        )}
       />
       <Popover.Content
         align="center"
@@ -1916,22 +1875,25 @@ function DiscardPendingChangesPopover({
           </p>
         </div>
         <div className="flex items-center justify-end gap-0.5 border-t border-kumo-line px-2 py-1.5">
-          <button
-            type="button"
+          <Button
+            variant="ghost"
+            size="sm"
+            className="disabled:hover:!bg-inherit"
             disabled={isDiscarding}
             onClick={() => onOpenChange(false)}
-            className="flex h-6 cursor-pointer items-center rounded-md px-2 text-[12px] font-medium tracking-[-0.15px] text-kumo-inactive transition-colors enabled:hover:bg-kumo-tint enabled:hover:text-kumo-default focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-kumo-ring disabled:cursor-not-allowed disabled:opacity-40"
           >
             Cancel
-          </button>
-          <button
-            type="button"
+          </Button>
+          <Button
+            variant="ghost"
+            size="sm"
+            className="enabled:hover:!text-kumo-danger disabled:hover:!bg-inherit"
             disabled={disabled || isDiscarding}
             onClick={onConfirm}
-            className="flex h-6 cursor-pointer items-center rounded-md px-2 text-[12px] font-medium tracking-[-0.15px] text-kumo-default transition-colors enabled:hover:bg-kumo-tint enabled:hover:text-kumo-danger focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-kumo-ring disabled:cursor-not-allowed disabled:opacity-40"
+            loading={isDiscarding}
           >
             {isDiscarding ? "Discarding..." : "Discard changes"}
-          </button>
+          </Button>
         </div>
       </Popover.Content>
     </Popover>
@@ -4705,22 +4667,24 @@ function ChatInterface({
             </div>
             {isPending && (
               <div className="ml-3 flex flex-shrink-0 items-center gap-2 self-center text-[13px] leading-4">
-                <button
-                  type="button"
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  className="hover:!text-kumo-danger"
                   onClick={() => handleDenyConnection(msg.requestId)}
                   disabled={isProc}
-                  className="cursor-pointer rounded-md px-2 py-1 font-medium text-kumo-inactive transition-colors duration-150 ease-out hover:text-kumo-danger focus-visible:text-kumo-danger focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-40"
                 >
                   Deny
-                </button>
-                <button
-                  type="button"
+                </Button>
+                <Button
+                  variant="primary"
+                  size="sm"
+                  className="!bg-kumo-brand enabled:hover:!bg-kumo-brand-hover"
                   onClick={() => handleAcceptConnection(msg)}
                   disabled={isProc}
-                  className="cursor-pointer rounded-md bg-kumo-brand px-3 py-1 font-medium text-white transition-[opacity,transform] duration-150 ease-out hover:opacity-90 focus-visible:outline-none active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40"
                 >
                   Set up
-                </button>
+                </Button>
               </div>
             )}
           </div>
@@ -5087,13 +5051,9 @@ function ChatInterface({
                 <p className="text-[13px] leading-[18px] text-kumo-inactive">
                   No conversations started by {chatListScope === "agents" ? "agents" : "people"} yet
                 </p>
-                <button
-                  type="button"
-                  onClick={() => setChatListScope("all")}
-                  className="mt-2 cursor-pointer rounded-md px-2 py-1 text-[12px] leading-4 font-medium text-kumo-subtle transition-colors duration-150 ease-out hover:text-kumo-default focus-visible:text-kumo-default focus-visible:outline-none"
-                >
+                <Button variant="ghost" size="sm" className="mt-2" onClick={() => setChatListScope("all")}>
                   Show all
-                </button>
+                </Button>
               </div>
             ) : (
               <div className="flex flex-col gap-4">
@@ -5296,29 +5256,17 @@ function ChatInterface({
         <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
           {/* Tab bar — in sidebar mode, show Chat / Connections tabs */}
           {sidebarMode && (
-            <div className="flex h-12 flex-shrink-0 items-center gap-5 border-b border-kumo-line px-4">
-              <button
-                type="button"
-                onClick={() => setSidebarActiveTab("chat")}
-                className={`relative flex h-full cursor-pointer items-center text-[13px] leading-[18px] tracking-[-0.25px] transition-colors ${
-                  sidebarActiveTab === "chat"
-                    ? "font-medium text-kumo-default after:absolute after:inset-x-1 after:bottom-0 after:h-0.5 after:rounded-full after:bg-kumo-contrast/70"
-                    : "font-normal text-kumo-subtle hover:text-kumo-default"
-                }`}
-              >
-                Chat
-              </button>
-              <button
-                type="button"
-                onClick={() => setSidebarActiveTab("connections")}
-                className={`relative flex h-full cursor-pointer items-center text-[13px] leading-[18px] tracking-[-0.25px] transition-colors ${
-                  sidebarActiveTab === "connections"
-                    ? "font-medium text-kumo-default after:absolute after:inset-x-1 after:bottom-0 after:h-0.5 after:rounded-full after:bg-kumo-contrast/70"
-                    : "font-normal text-kumo-subtle hover:text-kumo-default"
-                }`}
-              >
-                Connections
-              </button>
+            <div className="flex h-12 flex-shrink-0 items-center border-b border-kumo-line px-4">
+              <Tabs
+                variant="underline"
+                size="sm"
+                value={sidebarActiveTab}
+                onValueChange={(value) => setSidebarActiveTab(value as "chat" | "connections")}
+                tabs={[
+                  { value: "chat", label: "Chat" },
+                  { value: "connections", label: "Connections" },
+                ]}
+              />
             </div>
           )}
 
@@ -5575,17 +5523,17 @@ function ChatInterface({
                                     conversion to git-backed storage) can't be discarded
                                     individually -- only the banner's discard-all covers them. */}
                                 {entry.message.sequence >= chatEpoch && (
-                                <Tooltip content={discardLabel} asChild>
-                                  <button
-                                    type="button"
+                                  <Button
+                                    variant="ghost"
+                                    shape="square"
+                                    size="xs"
+                                    className="text-kumo-inactive hover:!text-kumo-default"
                                     disabled={isAgentActive || mainlineMerge !== undefined}
                                     onClick={() => handleRevertChanges(entry.message.sequence)}
-                                    className="flex cursor-pointer items-center rounded-md p-1 text-kumo-inactive transition-[color,opacity,transform] duration-150 ease-out hover:text-kumo-default focus-visible:text-kumo-default focus-visible:outline-none active:scale-[0.96] disabled:cursor-not-allowed disabled:opacity-40"
+                                    title={discardLabel}
                                     aria-label={discardLabel}
-                                  >
-                                    <ArrowUUpLeft size={15} />
-                                  </button>
-                                </Tooltip>
+                                    icon={<ArrowUUpLeft size={15} />}
+                                  />
                                 )}
                                 <Tooltip content={formatFullTimestamp(entry.message.timestamp)} asChild>
                                   <span className="px-1 font-mono text-[11px] leading-4 text-kumo-inactive">
@@ -5781,16 +5729,16 @@ function ChatInterface({
                                     : "opacity-100 sm:opacity-0 sm:group-hover/agentMessage:opacity-100 sm:group-focus-within/agentMessage:opacity-100"
                                 }`}>
                                   {hasMessageText && (
-                                    <Tooltip content="Copy message" asChild>
-                                      <button
-                                        type="button"
-                                        onClick={() => handleCopyMessage(msg.message)}
-                                        className="flex cursor-pointer items-center rounded-md p-1 text-kumo-inactive transition-[color,transform] duration-150 ease-out hover:text-kumo-default focus-visible:text-kumo-default focus-visible:outline-none active:scale-[0.96]"
-                                        aria-label="Copy message"
-                                      >
-                                        <Copy size={15} />
-                                      </button>
-                                    </Tooltip>
+                                    <Button
+                                      variant="ghost"
+                                      shape="square"
+                                      size="xs"
+                                      className="text-kumo-inactive hover:!text-kumo-default"
+                                      onClick={() => handleCopyMessage(msg.message)}
+                                      title="Copy message"
+                                      aria-label="Copy message"
+                                      icon={<Copy size={15} />}
+                                    />
                                   )}
                                   {pendingChange && (() => {
                                     const label = getDiscardLabel(
@@ -5798,17 +5746,17 @@ function ChatInterface({
                                       pendingChange.createdGadgetTitles,
                                     );
                                     return (
-                                    <Tooltip content={label} asChild>
-                                      <button
-                                        type="button"
+                                      <Button
+                                        variant="ghost"
+                                        shape="square"
+                                        size="xs"
+                                        className="text-kumo-inactive hover:!text-kumo-default"
                                         disabled={isAgentActive}
                                         onClick={() => handleRevertChanges(pendingChange.revertFrom)}
-                                        className="flex cursor-pointer items-center rounded-md p-1 text-kumo-inactive transition-[color,opacity,transform] duration-150 ease-out hover:text-kumo-default focus-visible:text-kumo-default focus-visible:outline-none active:scale-[0.96] disabled:cursor-not-allowed disabled:opacity-40"
+                                        title={label}
                                         aria-label={label}
-                                      >
-                                        <ArrowUUpLeft size={15} />
-                                      </button>
-                                    </Tooltip>
+                                        icon={<ArrowUUpLeft size={15} />}
+                                      />
                                     );
                                   })()}
                                   <Tooltip content={formatFullTimestamp(msg.timestamp)} asChild>
@@ -5957,29 +5905,29 @@ function ChatInterface({
                                     </Tooltip>
                                   </button>
                                   {isLast && msg.code === "usage_limit" && (
-                                    <Tooltip content="Add credits to continue." asChild>
-                                      <button
-                                        type="button"
-                                        onClick={() => setUsageModalOpen(true)}
-                                        className="flex flex-shrink-0 cursor-pointer items-center gap-1 rounded-md px-1 py-0.5 text-[13px] leading-4 font-medium text-kumo-default transition-[color,opacity,transform] duration-150 ease-out hover:text-kumo-default-hover focus-visible:text-kumo-default-hover focus-visible:outline-none active:scale-[0.98]"
-                                      >
-                                        <Lightning size={12} weight="bold" />
-                                        Continue
-                                      </button>
-                                    </Tooltip>
+                                    <Button
+                                      variant="ghost"
+                                      size="xs"
+                                      className="flex-shrink-0"
+                                      onClick={() => setUsageModalOpen(true)}
+                                      title="Add credits to continue."
+                                      icon={<Lightning size={12} weight="bold" />}
+                                    >
+                                      Continue
+                                    </Button>
                                   )}
                                   {isLast && msg.code !== "usage_limit" && (
-                                    <Tooltip content="Retry the last action." asChild>
-                                      <button
-                                        type="button"
-                                        onClick={() => handleRetry()}
-                                        disabled={selectedModel === null}
-                                        className="flex flex-shrink-0 cursor-pointer items-center gap-1 rounded-md px-1 py-0.5 text-[13px] leading-4 font-medium text-kumo-default transition-[color,opacity,transform] duration-150 ease-out hover:text-kumo-default-hover focus-visible:text-kumo-default-hover focus-visible:outline-none active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40"
-                                      >
-                                        <ArrowsClockwise size={12} weight="bold" />
-                                        Retry
-                                      </button>
-                                    </Tooltip>
+                                    <Button
+                                      variant="ghost"
+                                      size="xs"
+                                      className="flex-shrink-0"
+                                      onClick={() => handleRetry()}
+                                      disabled={selectedModel === null}
+                                      title="Retry the last action."
+                                      icon={<ArrowsClockwise size={12} weight="bold" />}
+                                    >
+                                      Retry
+                                    </Button>
                                   )}
                                 </div>
                                 {expanded && (
@@ -6048,26 +5996,25 @@ function ChatInterface({
                               </span>
                             </Tooltip>
                             <div className="flex flex-wrap items-center gap-2 text-[13px] leading-4">
-                              <Tooltip content="Throw away these draft edits." asChild>
-                                <button
-                                  type="button"
-                                  disabled={isAgentActive}
-                                  onClick={handleDiscardDraftChanges}
-                                  className="cursor-pointer rounded-md px-1 py-0.5 font-medium text-kumo-inactive transition-colors duration-150 ease-out hover:text-kumo-danger focus-visible:text-kumo-danger focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-40"
-                                >
-                                  Discard
-                                </button>
-                              </Tooltip>
-                              <Tooltip content="Save these edits as a draft version. They won't affect the gadget until you accept changes." asChild>
-                                <button
-                                  type="button"
-                                  disabled={isAgentActive}
-                                  onClick={handleFinalizeDraftChanges}
-                                  className="cursor-pointer rounded-md px-1 py-0.5 font-medium text-kumo-default transition-[color,opacity,transform] duration-150 ease-out hover:text-kumo-default-hover focus-visible:text-kumo-default-hover focus-visible:outline-none active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40"
-                                >
-                                  Save draft
-                                </button>
-                              </Tooltip>
+                              <Button
+                                variant="ghost"
+                                size="xs"
+                                className="hover:!text-kumo-danger"
+                                disabled={isAgentActive}
+                                onClick={handleDiscardDraftChanges}
+                                title="Throw away these draft edits."
+                              >
+                                Discard
+                              </Button>
+                              <Button
+                                variant="ghost"
+                                size="xs"
+                                disabled={isAgentActive}
+                                onClick={handleFinalizeDraftChanges}
+                                title="Save these edits as a draft version. They won't affect the gadget until you accept changes."
+                              >
+                                Save draft
+                              </Button>
                             </div>
                           </div>
                         </div>
