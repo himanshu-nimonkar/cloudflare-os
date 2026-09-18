@@ -16,8 +16,6 @@ import type { AccountDescription, SupportedResource, VendorDescription } from '@
 
 (globalThis as { IS_REACT_ACT_ENVIRONMENT?: boolean }).IS_REACT_ACT_ENVIRONMENT = true
 
-// Kumo's Dialog and Select portal their content and measure/position it (Select is a listbox
-// popup); jsdom implements neither ResizeObserver nor pointer capture.
 vi.stubGlobal('ResizeObserver', class {
   observe() {}
   unobserve() {}
@@ -170,8 +168,6 @@ describe('ObserverConfigModal account selection', () => {
       )
       await Promise.resolve()
     })
-    // Dialog and Select portal their content outside `container`, so callers search the whole
-    // document rather than being scoped to the render root.
     return document.body
   }
 
