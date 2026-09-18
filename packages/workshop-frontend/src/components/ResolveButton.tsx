@@ -1,3 +1,4 @@
+import { Button } from '@cloudflare/kumo'
 import type { MouseEventHandler } from 'react'
 
 export function ResolveButton({
@@ -12,20 +13,21 @@ export function ResolveButton({
   onClick: MouseEventHandler<HTMLButtonElement>
 }) {
   const toneClassName = variant === 'filled'
-    ? 'h-7 bg-kumo-brand px-3 text-white enabled:hover:opacity-90'
+    ? '!h-7 !bg-kumo-brand enabled:hover:!opacity-90'
     : tone === 'approve'
-      ? 'h-6 px-2 text-kumo-default enabled:hover:bg-kumo-tint enabled:hover:text-kumo-default-hover'
-      : 'h-6 px-2 text-kumo-inactive enabled:hover:bg-kumo-tint enabled:hover:text-kumo-danger'
+      ? '!h-6 !text-kumo-default disabled:hover:!bg-inherit'
+      : '!h-6 !text-kumo-inactive enabled:hover:!text-kumo-danger disabled:hover:!bg-inherit'
 
   return (
-    <button
-      type="button"
+    <Button
+      variant={variant === 'filled' ? 'primary' : 'ghost'}
+      size="sm"
       onClick={onClick}
       disabled={disabled}
-      className={`flex cursor-pointer items-center rounded-md text-[12px] font-medium tracking-[-0.15px] transition-colors disabled:cursor-not-allowed disabled:opacity-40 ${toneClassName}`}
+      className={toneClassName}
     >
       {tone === 'approve' ? 'Approve' : 'Deny'}
-    </button>
+    </Button>
   )
 }
 
@@ -37,13 +39,14 @@ export function AlwaysApproveButton({
   onClick: MouseEventHandler<HTMLButtonElement>
 }) {
   return (
-    <button
-      type="button"
+    <Button
+      variant="ghost"
+      size="sm"
       onClick={onClick}
       disabled={disabled}
-      className="flex h-6 cursor-pointer items-center rounded-md px-2 text-[12px] font-medium tracking-[-0.15px] text-kumo-inactive transition-colors enabled:hover:bg-kumo-tint enabled:hover:text-kumo-default disabled:cursor-not-allowed disabled:opacity-40"
+      className="!h-6 !text-kumo-inactive disabled:hover:!bg-inherit"
     >
       Always approve
-    </button>
+    </Button>
   )
 }
