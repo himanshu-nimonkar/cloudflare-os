@@ -42,8 +42,6 @@ afterAll(() => {
   }
 })
 
-// Kumo's Dialog and DropdownMenu (both Base UI-backed) measure/position their portaled content
-// and track pointer capture; jsdom implements neither ResizeObserver nor pointer capture.
 vi.stubGlobal('ResizeObserver', class {
   observe() {}
   unobserve() {}
@@ -73,8 +71,6 @@ vi.mock('@cloudflare/kumo', async (importOriginal) => {
   }
 })
 
-// PersonAvatar calls a real avatar-lookup RPC this test's fake AuthenticatedApi doesn't
-// implement; nothing in these tests depends on its output, so this boundary stays mocked.
 vi.mock('./components/PersonAvatar', () => ({
   PersonAvatar: () => <span data-testid="avatar" />,
 }))
@@ -172,8 +168,6 @@ function click(element: Element) {
   })
 }
 
-// A plain `.click()`/`click()` dispatches only a `click` event; Base UI's DropdownMenu trigger
-// also needs the pointerdown/mousedown pair that precedes it to correctly toggle open.
 function realClick(element: Element) {
   return act(async () => {
     const pointerOpts = { bubbles: true, cancelable: true, pointerId: 1, isPrimary: true }
@@ -192,14 +186,12 @@ function button(rendered: HTMLElement, label: string): HTMLButtonElement {
   return found
 }
 
-// Opens a RoleMenu (Kumo DropdownMenu) by the aria-label on its trigger button.
 async function openRoleMenu(rendered: HTMLElement, triggerAriaLabel: string) {
   const trigger = rendered.querySelector<HTMLButtonElement>(`[aria-label="${triggerAriaLabel}"]`)
   if (!trigger) throw new Error(`No role menu trigger labelled “${triggerAriaLabel}”`)
   await realClick(trigger)
 }
 
-// DropdownMenu.Item renders as a real element with data-kumo-part="item", not a <button>.
 function roleOption(rendered: HTMLElement, label: string): HTMLElement {
   const found = [...rendered.querySelectorAll<HTMLElement>('[data-kumo-part="item"]')]
     .find(candidate => candidate.textContent?.startsWith(label))
@@ -775,12 +767,9 @@ describe('ShareModal', () => {
     expect(rendered.querySelector('#invite-verification-heading')).toBeNull()
     expect(rendered.querySelector('#link-verification-heading')).toBeNull()
 
-    // Both role pickers independently offer "Workspace" (opening one closes the other, so this
-    // is checked one at a time rather than expecting both open together).
     await openRoleMenu(rendered, 'Access to grant')
     expect(roleOption(rendered, 'Workspace')).toBeDefined()
 
-    // Only the share-link picker's selection should move — the invite picker is untouched.
     await openRoleMenu(rendered, 'Access granted by link')
     await click(roleOption(rendered, 'Workspace'))
 
