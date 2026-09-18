@@ -768,8 +768,6 @@ export default function GadgetEditor() {
     return () => { cancelled = true; setHookedGadgetIds(NO_GADGETS) }
   }, [overseer, hookSignature, metadata !== null, isUseOnly])
   const pendingActionCount = pendingActions.length
-  // Shared by the desktop and mobile Tabs instances (and across renders): both read the same
-  // memoized array instead of each rebuilding its own copy of a list that rarely changes.
   const memoizedActivityTabItems = useMemo(
     () => activityTabItems(pendingActionCount),
     [pendingActionCount],

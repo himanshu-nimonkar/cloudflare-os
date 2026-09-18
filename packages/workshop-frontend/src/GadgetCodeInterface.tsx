@@ -1093,8 +1093,6 @@ export default function GadgetCodeInterface({
       )}
       <div className="relative flex min-h-0 flex-1">
         {fileDrawerOpen && (
-          // A plain click-catching overlay, not a styled control -- Kumo's Button fights its own
-          // defaults (padding, radius, hover, focus ring) for a scrim like this.
           <button
             type="button"
             aria-label="Close files"

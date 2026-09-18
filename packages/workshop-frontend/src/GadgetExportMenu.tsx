@@ -17,8 +17,6 @@ export default function GadgetExportMenu({ gadget, gadgetTitle, chatId }: Props)
   const [formats, setFormats] = useState<GadgetExportFormat[] | null>(null)
   const [loading, setLoading] = useState(false)
   const [loadFailed, setLoadFailed] = useState(false)
-  // The full format, not just its id: the menu closes (and clears `formats`) as soon as an item is
-  // picked, so the label for "Exporting to X" must survive independently of the format list.
   const [exportingFormat, setExportingFormat] = useState<GadgetExportFormat | null>(null)
   const formatRequest = useRef(0)
   const toasts = useKumoToastManager()
