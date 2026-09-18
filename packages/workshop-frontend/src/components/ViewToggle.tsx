@@ -8,9 +8,6 @@ const toggleButtonClass = (active: boolean) => (
 /**
  * Shared grid/list segmented toggle. Used on Gatekeepers and Outputs so view-switching looks and
  * behaves identically across the app.
- *
- * Built from plain buttons rather than Kumo `Tabs`: this switches a display mode, not a set of tab
- * panels, so `Tabs`'s tablist/tab roles would tell screen readers the wrong interaction model.
  */
 export default function ViewToggle({
   view,
