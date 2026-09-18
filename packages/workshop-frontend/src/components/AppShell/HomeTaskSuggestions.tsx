@@ -1,4 +1,5 @@
 import { useMemo } from 'react'
+import { Button } from '@cloudflare/kumo'
 import {
   AppWindow,
   ChartLineUp,
@@ -78,14 +79,16 @@ function SuggestionRow({
 }) {
   return (
     <li>
-      <button
-        type="button"
+      <Button
+        variant="ghost"
         onClick={onClick}
-        className="press group flex w-full cursor-pointer items-center gap-3 rounded-xl px-2 py-2 text-left transition-colors hover:bg-kumo-tint"
+        icon={
+          <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-kumo-fill text-kumo-subtle transition-colors group-hover:text-kumo-default">
+            {icon}
+          </span>
+        }
+        className="group !w-full !justify-start gap-3 !px-2 !py-2 text-left"
       >
-        <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg bg-kumo-fill text-kumo-subtle transition-colors group-hover:text-kumo-default">
-          {icon}
-        </span>
         <span className="min-w-0 flex-1">
           <span className="block truncate text-[13px] leading-[18px] font-medium tracking-[-0.25px] text-kumo-default">
             {label}
@@ -94,7 +97,7 @@ function SuggestionRow({
             {description}
           </span>
         </span>
-      </button>
+      </Button>
     </li>
   )
 }

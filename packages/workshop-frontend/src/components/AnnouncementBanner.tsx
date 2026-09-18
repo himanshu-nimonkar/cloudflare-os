@@ -1,4 +1,5 @@
 import { useState, useEffect, type CSSProperties } from 'react'
+import { Button } from '@cloudflare/kumo'
 import { X } from '@phosphor-icons/react'
 import ReactMarkdown, { type Components } from 'react-markdown'
 import remarkGfm from 'remark-gfm'
@@ -73,15 +74,18 @@ export default function AnnouncementBanner() {
           {text}
         </ReactMarkdown>
       </div>
-      <button
+      <Button
+        variant="ghost"
+        shape="square"
+        size="xs"
         onClick={handleDismiss}
-        className="flex-shrink-0 rounded-md p-0.5 hover:bg-black/10 transition-colors"
-        aria-label="Dismiss banner"
+        className="flex-shrink-0 !bg-transparent hover:!bg-black/10"
         title="Dismiss"
+        aria-label="Dismiss banner"
         style={{ color: 'inherit' }}
       >
         <X size={16} />
-      </button>
+      </Button>
     </div>
   )
 }

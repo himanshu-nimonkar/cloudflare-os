@@ -1,6 +1,6 @@
 import { Link } from '@tanstack/react-router'
 import { DotsThree, Star, ShareNetwork, Trash, Pencil } from '@phosphor-icons/react'
-import { DropdownMenu } from '@cloudflare/kumo'
+import { Button, DropdownMenu } from '@cloudflare/kumo'
 import { MENU_CONTENT, MENU_ITEM, MENU_ITEM_DANGER, MENU_POSITIONER_STYLE } from '../menuStyles'
 import { useState, useEffect, useRef } from 'react'
 import type { GadgetMetadataWithTimestamps } from '@gadgets/workshop-shared/api'
@@ -96,13 +96,13 @@ export default function SidebarGadgetRow({
             <DropdownMenu>
               <DropdownMenu.Trigger
                 render={
-                  <button
-                    type="button"
+                  <Button
+                    variant="ghost"
+                    shape="square"
                     aria-label="Workspace actions"
-                    className="flex h-6 w-6 items-center justify-center rounded-md text-kumo-subtle opacity-0 transition-[opacity,color,background-color] group-hover:opacity-100 hover:bg-kumo-fill hover:text-kumo-default focus:opacity-100"
-                  >
-                    <DotsThree size={14} weight="bold" />
-                  </button>
+                    icon={<DotsThree size={14} weight="bold" />}
+                    className="!h-6 !w-6 !text-kumo-subtle opacity-0 group-hover:opacity-100 focus:opacity-100"
+                  />
                 }
               />
               <DropdownMenu.Content className={MENU_CONTENT} style={MENU_POSITIONER_STYLE}>

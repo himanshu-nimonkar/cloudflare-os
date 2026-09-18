@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useRef, useState } from 'react'
 import { useRouterState } from '@tanstack/react-router'
+import { Button } from '@cloudflare/kumo'
 import { List, X } from '@phosphor-icons/react'
 import TopBarNotice from '../../TopBarNotice'
 import ReconnectingChip from '../ReconnectingChip'
@@ -144,15 +145,15 @@ export default function AppShell({ children }: { children: React.ReactNode }) {
             chrome strip across the top. Mostly empty — carries the mobile hamburger on the left,
             any admin TopBarNotice centered, and the reconnecting chip on the right. */}
         <div className="relative flex h-14 shrink-0 items-center justify-between border-b border-kumo-line bg-kumo-base px-3">
-          <button
-            type="button"
+          <Button
+            variant="ghost"
+            shape="square"
             ref={menuButtonRef}
             onClick={() => setMobileOpen((o) => !o)}
             aria-label={mobileOpen ? 'Close menu' : 'Open menu'}
-            className="flex h-11 w-11 items-center justify-center rounded-md text-kumo-default transition-colors hover:bg-kumo-tint md:hidden"
-          >
-            {mobileOpen ? <X size={16} /> : <List size={16} />}
-          </button>
+            icon={mobileOpen ? <X size={16} /> : <List size={16} />}
+            className="!h-11 !w-11 !text-kumo-default md:!hidden"
+          />
           <TopBarNotice />
           {/* `ml-auto` rather than the container's `justify-between`: on desktop the hamburger is
               hidden, leaving this the only in-flow child, which `justify-between` would park on the
