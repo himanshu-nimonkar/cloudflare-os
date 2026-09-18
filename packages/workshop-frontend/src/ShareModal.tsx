@@ -1,6 +1,6 @@
 import { useState, useEffect, useLayoutEffect, useCallback, useMemo, useRef, useId, type KeyboardEvent, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
-import { Checkbox, Dialog, DropdownMenu, useKumoToastManager } from '@cloudflare/kumo'
+import { Badge, Button, Checkbox, Dialog, DropdownMenu, useKumoToastManager } from '@cloudflare/kumo'
 import type { PortalContainer } from '@cloudflare/kumo'
 import { CaretDown, Check, Copy, Link, PencilSimple, ShieldCheck, ShieldWarning, Trash, UserPlus, X } from '@phosphor-icons/react'
 import { RpcStub } from 'capnweb'
@@ -140,15 +140,9 @@ function RoleMenu({
 function RoleBadge({ role }: { role: CollaboratorRole | undefined }) {
   const isBuild = (role ?? 'build') === 'build'
   return (
-    <span
-      className={`shrink-0 rounded-full border px-2.5 py-[3px] text-[11px] leading-4 font-medium tracking-[-0.1px] ${
-        isBuild
-          ? 'border-kumo-line bg-kumo-tint/70 text-kumo-default'
-          : 'border-kumo-line/70 bg-kumo-base text-kumo-subtle'
-      }`}
-    >
+    <Badge variant={isBuild ? 'secondary' : 'outline'} className="shrink-0">
       {roleLabel(role)}
-    </span>
+    </Badge>
   )
 }
 
@@ -169,27 +163,27 @@ function InlineConfirm({
 }) {
   return (
     <div className="flex items-center gap-1 share-confirm-in">
-      <button
-        type="button"
+      <Button
+        variant="ghost"
+        size="sm"
         onClick={onConfirm}
         disabled={busy}
-        className={`inline-flex h-7 cursor-pointer items-center rounded-lg px-2.5 text-[12px] leading-4 font-medium tracking-[-0.1px] transition-[background-color,transform] duration-150 ease-out active:scale-[0.97] disabled:opacity-60 ${
-          tone === 'danger'
-            ? 'text-kumo-danger hover:bg-kumo-danger-tint'
-            : 'text-kumo-brand hover:bg-kumo-tint'
-        }`}
+        loading={busy}
+        className={tone === 'danger'
+          ? '!text-kumo-danger hover:!bg-kumo-danger-tint'
+          : '!text-kumo-brand'}
       >
         {busy ? (busyLabel ?? `${label}…`) : label}
-      </button>
-      <button
-        type="button"
+      </Button>
+      <Button
+        variant="ghost"
+        shape="square"
+        size="sm"
         onClick={onCancel}
         disabled={busy}
         aria-label="Cancel"
-        className="grid h-7 w-7 cursor-pointer place-items-center rounded-lg text-kumo-inactive transition-[background-color,color,transform] duration-150 ease-out hover:bg-kumo-tint hover:text-kumo-default active:scale-[0.96] disabled:opacity-60"
-      >
-        <X size={14} />
-      </button>
+        icon={<X size={14} />}
+      />
     </div>
   )
 }
@@ -1202,13 +1196,13 @@ export default function ShareModal({ open, onClose, overseer, metadata, currentU
                 </div>
               )
             ) : (
-              <button
-                type="button"
+              <WorkshopButton
+                icon={Link}
                 onClick={() => setShowLinkComposer(true)}
-                className="themed-compact-shadow flex h-12 w-full cursor-pointer items-center justify-center gap-1.5 rounded-2xl border border-kumo-line/80 bg-kumo-base px-3 text-[13px] font-medium text-kumo-subtle transition-[background-color,color,transform] duration-150 ease-out hover:bg-kumo-elevated/60 hover:text-kumo-default active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-40"
+                className="themed-compact-shadow !h-12 w-full !rounded-2xl border-kumo-line/80 hover:!bg-kumo-elevated/60"
               >
-                <Link size={14} /> Create a share link
-              </button>
+                Create a share link
+              </WorkshopButton>
             )}
           </div>
           </div>

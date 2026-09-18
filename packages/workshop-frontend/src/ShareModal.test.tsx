@@ -1,7 +1,7 @@
 // @vitest-environment jsdom
 /* eslint-disable react/react-in-jsx-scope */
 
-import { act, type ComponentProps, type ReactElement, type ReactNode } from 'react'
+import { act } from 'react'
 import { createRoot, type Root } from 'react-dom/client'
 import { afterAll, afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { RpcStub } from 'capnweb'
@@ -42,43 +42,34 @@ afterAll(() => {
   }
 })
 
-vi.mock('@cloudflare/kumo', () => {
-  const Dialog = Object.assign(
-    ({ children }: { children: ReactNode }) => <dialog open>{children}</dialog>,
-    {
-      Root: ({ children }: { children: ReactNode }) => <>{children}</>,
-      Title: ({ children }: { children: ReactNode }) => <h2>{children}</h2>,
-      Description: ({ children }: { children: ReactNode }) => <p>{children}</p>,
-      Close: ({ render }: { render: (props: object) => ReactElement }) =>
-        render({ 'aria-label': 'Close' }),
-    },
-  )
-  const DropdownMenu = Object.assign(
-    ({ children }: { children: ReactNode }) => <div>{children}</div>,
-    {
-      Trigger: ({ render }: { render: ReactElement }) => render,
-      Content: ({ children }: { children: ReactNode }) => <div>{children}</div>,
-      Item: ({ children, onClick }: { children: ReactNode; onClick?: () => void }) => (
-        <button type="button" data-testid="role-option" onClick={onClick}>{children}</button>
-      ),
-    },
-  )
+vi.stubGlobal('ResizeObserver', class {
+  observe() {}
+  unobserve() {}
+  disconnect() {}
+})
+Element.prototype.hasPointerCapture ??= () => false
+Element.prototype.setPointerCapture ??= () => {}
+Element.prototype.releasePointerCapture ??= () => {}
+if (typeof PointerEvent === 'undefined') {
+  class PointerEventPolyfill extends MouseEvent {
+    pointerId: number
+    isPrimary: boolean
+    constructor(type: string, params: MouseEventInit & { pointerId?: number; isPrimary?: boolean } = {}) {
+      super(type, params)
+      this.pointerId = params.pointerId ?? 0
+      this.isPrimary = params.isPrimary ?? true
+    }
+  }
+  vi.stubGlobal('PointerEvent', PointerEventPolyfill)
+}
+
+vi.mock('@cloudflare/kumo', async (importOriginal) => {
+  const actual = await importOriginal<typeof import('@cloudflare/kumo')>()
   return {
-    Checkbox: ({ label }: { label: ReactNode }) => <label>{label}</label>,
-    Dialog,
-    DropdownMenu,
+    ...actual,
     useKumoToastManager: () => ({ add: toastAdd }),
   }
 })
-
-vi.mock('./components/WorkshopControls', () => ({
-  WorkshopButton: ({ children, ...props }: ComponentProps<'button'>) => (
-    <button type="button" {...props}>{children}</button>
-  ),
-  WorkshopIconButton: ({ children, ...props }: ComponentProps<'button'>) => (
-    <button type="button" {...props}>{children}</button>
-  ),
-}))
 
 vi.mock('./components/PersonAvatar', () => ({
   PersonAvatar: () => <span data-testid="avatar" />,
@@ -177,6 +168,17 @@ function click(element: Element) {
   })
 }
 
+function realClick(element: Element) {
+  return act(async () => {
+    const pointerOpts = { bubbles: true, cancelable: true, pointerId: 1, isPrimary: true }
+    element.dispatchEvent(new PointerEvent('pointerdown', pointerOpts))
+    element.dispatchEvent(new MouseEvent('mousedown', { bubbles: true, cancelable: true }))
+    element.dispatchEvent(new PointerEvent('pointerup', pointerOpts))
+    element.dispatchEvent(new MouseEvent('mouseup', { bubbles: true, cancelable: true }))
+    element.dispatchEvent(new MouseEvent('click', { bubbles: true, cancelable: true }))
+  })
+}
+
 function button(rendered: HTMLElement, label: string): HTMLButtonElement {
   const found = [...rendered.querySelectorAll('button')].find(candidate =>
     candidate.textContent?.trim() === label || candidate.getAttribute('aria-label') === label)
@@ -184,8 +186,14 @@ function button(rendered: HTMLElement, label: string): HTMLButtonElement {
   return found
 }
 
-function roleOption(rendered: HTMLElement, label: string): HTMLButtonElement {
-  const found = [...rendered.querySelectorAll<HTMLButtonElement>('[data-testid="role-option"]')]
+async function openRoleMenu(rendered: HTMLElement, triggerAriaLabel: string) {
+  const trigger = rendered.querySelector<HTMLButtonElement>(`[aria-label="${triggerAriaLabel}"]`)
+  if (!trigger) throw new Error(`No role menu trigger labelled “${triggerAriaLabel}”`)
+  await realClick(trigger)
+}
+
+function roleOption(rendered: HTMLElement, label: string): HTMLElement {
+  const found = [...rendered.querySelectorAll<HTMLElement>('[data-kumo-part="item"]')]
     .find(candidate => candidate.textContent?.startsWith(label))
   if (!found) throw new Error(`No role option for “${label}”`)
   return found
@@ -686,7 +694,7 @@ describe('ShareModal', () => {
     const input = rendered.querySelector<HTMLInputElement>('input[aria-label="Search people"]')!
     const listbox = rendered.querySelector<HTMLDivElement>('[role="listbox"]')!
     const modalScroller = input.closest<HTMLDivElement>('.chat-panel')!
-    expect(listbox.closest('dialog')).not.toBeNull()
+    expect(listbox.closest('[role="dialog"]')).not.toBeNull()
     const targetId = `${input.getAttribute('aria-controls')}-option-6`
     const target = document.getElementById(targetId)!
     listbox.getBoundingClientRect = () => ({
@@ -743,6 +751,7 @@ describe('ShareModal', () => {
     expect(rendered.textContent).toContain('Q3 planning')
     expect(rendered.textContent).not.toContain('Pipeline dashboard')
 
+    await openRoleMenu(rendered, 'Access to grant')
     await click(roleOption(rendered, 'Workspace'))
 
     expect(rendered.textContent).toContain('Pipeline dashboard')
@@ -758,10 +767,11 @@ describe('ShareModal', () => {
     expect(rendered.querySelector('#invite-verification-heading')).toBeNull()
     expect(rendered.querySelector('#link-verification-heading')).toBeNull()
 
-    const buildOptions = [...rendered.querySelectorAll<HTMLButtonElement>('[data-testid="role-option"]')]
-      .filter(option => option.textContent?.startsWith('Workspace'))
-    expect(buildOptions).toHaveLength(2)
-    await click(buildOptions[1])
+    await openRoleMenu(rendered, 'Access to grant')
+    expect(roleOption(rendered, 'Workspace')).toBeDefined()
+
+    await openRoleMenu(rendered, 'Access granted by link')
+    await click(roleOption(rendered, 'Workspace'))
 
     expect(verificationSection(rendered, 'invite-verification-heading').textContent)
       .not.toContain('Pipeline dashboard')
