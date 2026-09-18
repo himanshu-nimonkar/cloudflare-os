@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { DropdownMenu, Tooltip, useKumoToastManager } from '@cloudflare/kumo'
+import { Button, DropdownMenu, Tooltip, useKumoToastManager } from '@cloudflare/kumo'
 import { DownloadSimple } from '@phosphor-icons/react'
 import type { RpcStub } from 'capnweb'
 import type { GadgetClient } from '@gadgets/workshop-shared/api'
@@ -17,7 +17,7 @@ export default function GadgetExportMenu({ gadget, gadgetTitle, chatId }: Props)
   const [formats, setFormats] = useState<GadgetExportFormat[] | null>(null)
   const [loading, setLoading] = useState(false)
   const [loadFailed, setLoadFailed] = useState(false)
-  const [exportingId, setExportingId] = useState<string | null>(null)
+  const [exportingFormat, setExportingFormat] = useState<GadgetExportFormat | null>(null)
   const formatRequest = useRef(0)
   const toasts = useKumoToastManager()
 
@@ -58,9 +58,9 @@ export default function GadgetExportMenu({ gadget, gadgetTitle, chatId }: Props)
   }
 
   const download = async (format: GadgetExportFormat) => {
-    if (!gadget || exportingId !== null) return
+    if (!gadget || exportingFormat !== null) return
 
-    setExportingId(format.id)
+    setExportingFormat(format)
     try {
       await saveStreamToFile(
         () => gadget.export(format.id, chatId),
@@ -75,13 +75,12 @@ export default function GadgetExportMenu({ gadget, gadgetTitle, chatId }: Props)
       console.error(`Failed to export Gadget as ${format.label}:`, error)
       toasts.add({ title: `Failed to export ${format.label}`, variant: 'error' })
     } finally {
-      setExportingId(null)
+      setExportingFormat(null)
     }
   }
 
   if (!gadget) return null
 
-  const exportingFormat = formats?.find(format => format.id === exportingId)
   const tooltip = exportingFormat ? `Exporting to ${exportingFormat.label}` : 'Export Gadget'
 
   return (
@@ -92,7 +91,7 @@ export default function GadgetExportMenu({ gadget, gadgetTitle, chatId }: Props)
             render={(
               <WorkshopIconButton
                 aria-label="Export Gadget"
-                disabled={exportingId !== null}
+                disabled={exportingFormat !== null}
               >
                 <DownloadSimple size={17} />
               </WorkshopIconButton>
@@ -111,13 +110,14 @@ export default function GadgetExportMenu({ gadget, gadgetTitle, chatId }: Props)
             ) : loadFailed ? (
               <div className="px-2.5 py-2 text-[12px] leading-4 text-kumo-subtle">
                 <p>Export formats could not be loaded.</p>
-                <button
-                  type="button"
+                <Button
+                  variant="ghost"
+                  size="sm"
                   onClick={loadFormats}
-                  className="mt-1 font-medium text-kumo-default hover:underline"
+                  className="mt-1 !h-auto !px-0 font-medium underline-offset-2 hover:underline"
                 >
                   Try again
-                </button>
+                </Button>
               </div>
             ) : formats?.length === 0 ? (
               <p className="px-2.5 py-2 text-[12px] leading-4 text-kumo-subtle">
@@ -135,7 +135,7 @@ export default function GadgetExportMenu({ gadget, gadgetTitle, chatId }: Props)
             ))}
           </DropdownMenu.Content>
         </DropdownMenu>
-        {exportingId !== null && (
+        {exportingFormat !== null && (
           <span className="pointer-events-none absolute bottom-0 left-1 right-1 h-0.5 overflow-hidden rounded-full bg-kumo-fill">
             <span className="absolute inset-y-0 w-1/3 bg-kumo-brand animate-[thinking_1.5s_ease-in-out_infinite]" />
           </span>

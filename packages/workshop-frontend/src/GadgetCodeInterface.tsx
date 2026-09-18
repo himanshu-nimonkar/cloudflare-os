@@ -1,6 +1,6 @@
 import { useState, useEffect, useLayoutEffect, useRef, useCallback, useMemo } from 'react'
-import { useKumoToastManager } from '@cloudflare/kumo'
-import { DownloadSimple, List } from '@phosphor-icons/react'
+import { Banner, Empty, useKumoToastManager } from '@cloudflare/kumo'
+import { DownloadSimple, List, WarningCircle } from '@phosphor-icons/react'
 import { Overseer, WorkpieceId } from '@gadgets/workshop-shared/api'
 import type { CodeChange, FileChange, TextChange } from '@gadgets/workshop-shared/code-change'
 import { RpcStub } from 'capnweb'
@@ -1083,10 +1083,13 @@ export default function GadgetCodeInterface({
   return (
     <div style={{ display: 'flex', flexDirection: 'column', height, width: '100%' }}>
       {hasUnsavedChanges && (
-        <div className="bg-kumo-tint border-b border-kumo-line px-4 py-2 flex items-center gap-2 text-sm text-kumo-warning">
-          <span className="text-base">&#9888;&#65039;</span>
-          <span>Connection issue - changes will be saved when connection is restored</span>
-        </div>
+        <Banner
+          variant="alert"
+          size="sm"
+          icon={<WarningCircle />}
+          description="Connection issue - changes will be saved when connection is restored"
+          className="!rounded-none border-b border-kumo-line"
+        />
       )}
       <div className="relative flex min-h-0 flex-1">
         {fileDrawerOpen && (
@@ -1168,30 +1171,28 @@ export default function GadgetCodeInterface({
           </div>
           <div className="min-h-0 flex-1">
             {stableDisplayedFiles.length === 0 ? (
-              <div className="flex h-full flex-col items-center justify-center bg-kumo-base px-6 text-center">
-                <div className="max-w-[360px]">
-                  <p className="m-0 text-[15px] leading-[22px] font-semibold tracking-[-0.3px] text-kumo-default">
-                    No files yet
-                  </p>
-                  <p className="mt-1.5 mb-0 text-[13px] leading-[19px] tracking-[-0.25px] text-kumo-subtle">
-                    {branchMode
-                      ? 'Keep building with the agent in chat and files will appear here as it works, or create one yourself.'
-                      : 'Open a conversation and build with the agent, and its accepted files will appear here.'}
-                  </p>
-                  {branchMode && (
-                    <div className="mt-4 flex justify-center">
-                      <WorkshopButton
-                        onClick={() => fileSidebarRef.current?.openCreateModal()}
-                        disabled={isEditingLocked}
-                        tone="primary"
-                        className="!h-8"
-                      >
-                        New file
-                      </WorkshopButton>
-                    </div>
-                  )}
-                </div>
-              </div>
+              <Empty
+                size="sm"
+                className="!h-full !border-0 !bg-kumo-base"
+                title="No files yet"
+                description={
+                  branchMode
+                    ? 'Keep building with the agent in chat and files will appear here as it works, or create one yourself.'
+                    : 'Open a conversation and build with the agent, and its accepted files will appear here.'
+                }
+                contents={
+                  branchMode ? (
+                    <WorkshopButton
+                      onClick={() => fileSidebarRef.current?.openCreateModal()}
+                      disabled={isEditingLocked}
+                      tone="primary"
+                      className="!h-8"
+                    >
+                      New file
+                    </WorkshopButton>
+                  ) : undefined
+                }
+              />
             ) : isDiffMode ? (
               <CodeDiffEditor
                 filename={activeFile}
