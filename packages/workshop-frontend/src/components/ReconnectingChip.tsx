@@ -8,7 +8,6 @@ import { Badge } from '@cloudflare/kumo'
  */
 export default function ReconnectingChip() {
   return (
-    // Badge doesn't forward arbitrary props (e.g. role), so the a11y status role wraps it.
     <span role="status">
       <Badge variant="warning" className="border border-kumo-warning/20">
         Reconnecting…
