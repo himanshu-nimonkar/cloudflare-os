@@ -1,6 +1,6 @@
 import { logRpcFailure } from './rpcErrors'
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
-import { Dialog, useKumoToastManager } from '@cloudflare/kumo'
+import { Button, Collapsible, Dialog, InputGroup, useKumoToastManager } from '@cloudflare/kumo'
 import {
   CaretDown,
   CaretLeft,
@@ -804,14 +804,15 @@ export default function GatekeeperModal({
         {selectedConnection ? (
           <div ref={scrollRef} className="new-gatekeeper-scroll min-h-0 flex-1 overflow-y-auto px-5 py-4">
             <div ref={scrollContentRef}>
-              <button
-                type="button"
+              <Button
+                variant="ghost"
+                size="xs"
+                icon={<CaretLeft size={13} />}
                 onClick={() => setSelectedConnectionId(null)}
-                className="mb-4 inline-flex cursor-pointer items-center gap-1.5 text-[12px] leading-4 font-medium tracking-[-0.2px] text-kumo-subtle transition-colors hover:text-kumo-default"
+                className="mb-4 !px-0 !text-kumo-subtle hover:!text-kumo-default"
               >
-                <CaretLeft size={13} />
                 All connection types
-              </button>
+              </Button>
 
               <div className="space-y-4">
                 {needsAccount && (
@@ -879,16 +880,18 @@ export default function GatekeeperModal({
         ) : (
           <div className="flex min-h-0 flex-1 flex-col overflow-hidden">
             <div className="shrink-0 border-b border-kumo-line bg-kumo-base px-5 py-4">
-              <div className="relative">
-                <MagnifyingGlass size={15} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-kumo-inactive" />
-                <input
+              <InputGroup>
+                <InputGroup.Addon align="start">
+                  <MagnifyingGlass size={15} />
+                </InputGroup.Addon>
+                <InputGroup.Input
+                  aria-label="Search services, apps, data sources"
                   value={searchText}
                   onChange={(event) => setSearchText(event.target.value)}
                   placeholder="Search services, apps, data sources..."
                   autoFocus
-                  className="h-10 w-full rounded-xl border border-kumo-line bg-kumo-base pl-9 pr-3 text-[13px] leading-[18px] font-normal tracking-[-0.25px] text-kumo-default placeholder:text-kumo-inactive shadow-none outline-none transition-[border-color,box-shadow] focus:border-kumo-ring focus:ring-2 focus:ring-kumo-ring/10"
                 />
-              </div>
+              </InputGroup>
             </div>
 
             <div className="new-gatekeeper-scroll min-h-0 flex-1 overflow-y-auto px-5 py-4">
@@ -1040,11 +1043,12 @@ function ConnectionGroupRow({
     : items.map(item => item.title).join(', ')
 
   return (
-    <div className={first ? '' : 'border-t border-kumo-line'}>
-      <button
-        type="button"
-        onClick={handleClick}
-        aria-expanded={expanded}
+    <Collapsible.Root
+      open={expanded}
+      onOpenChange={handleClick}
+      className={first ? '' : 'border-t border-kumo-line'}
+    >
+      <Collapsible.Trigger
         aria-controls={panelId}
         className="group flex w-full cursor-pointer items-center gap-3 px-3 py-3 text-left transition-colors hover:bg-kumo-elevated"
       >
@@ -1077,10 +1081,9 @@ function ConnectionGroupRow({
           size={14}
           className={`shrink-0 text-kumo-inactive transition-transform group-hover:text-kumo-default ${expanded ? 'rotate-180' : ''}`}
         />
-      </button>
+      </Collapsible.Trigger>
 
-      {expanded && (
-        <div id={panelId} className="border-t border-kumo-line bg-kumo-elevated/30">
+      <Collapsible.Panel id={panelId} className="border-t border-kumo-line bg-kumo-elevated/30">
           {items.map(item => (
             <button
               key={item.id}
@@ -1108,8 +1111,7 @@ function ConnectionGroupRow({
               <CaretRight size={13} className="shrink-0 text-kumo-inactive transition-transform group-hover:translate-x-0.5 group-hover:text-kumo-default" />
             </button>
           ))}
-        </div>
-      )}
-    </div>
+      </Collapsible.Panel>
+    </Collapsible.Root>
   )
 }

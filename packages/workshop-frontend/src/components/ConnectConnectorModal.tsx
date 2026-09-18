@@ -1,4 +1,4 @@
-import { Dialog, Switch } from '@cloudflare/kumo'
+import { Badge, Dialog, Switch } from '@cloudflare/kumo'
 import { X, ShieldCheck } from '@phosphor-icons/react'
 import { useEffect, useMemo, useState } from 'react'
 import {
@@ -153,13 +153,11 @@ export default function ConnectConnectorModal({
     : `Connect ${vendorDescription.displayName}`
 
   const headerSubline = isManage ? (
-    <div className="mt-0.5 flex items-center gap-1.5 text-[13px] leading-[18px] font-normal tracking-[-0.25px] text-kumo-subtle">
-      <span
-        className={`h-1.5 w-1.5 shrink-0 rounded-full ${
-          credentialsValid ? 'bg-kumo-success' : 'bg-kumo-danger'
-        }`}
-        aria-hidden
-      />
+    <Badge
+      variant={credentialsValid ? 'success' : 'error'}
+      appearance="dot"
+      className="mt-0.5 max-w-full !bg-transparent !p-0 !text-[13px] !font-normal !text-kumo-subtle !ring-0"
+    >
       <span className="truncate">
         {credentialsValid
           ? accountDescription?.uniqueName
@@ -167,7 +165,7 @@ export default function ConnectConnectorModal({
             : accountDisplayName
           : 'Credentials expired; reconnect from the Gatekeepers page'}
       </span>
-    </div>
+    </Badge>
   ) : (
     vendorDescription.tagline && (
       <Dialog.Description className="mt-0.5 text-[13px] leading-[18px] font-normal tracking-[-0.25px] text-kumo-subtle">

@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { Button } from '@cloudflare/kumo'
 import { Check, Plus, UserCircle } from '@phosphor-icons/react'
 import { AccountDescription, SupportedResource, VendorDescription } from '@gadgets/workshop-shared/gatekeeper'
 
@@ -116,23 +117,25 @@ export function AccountChooser({
                 </div>
               </button>
               {expired ? (
-                <button
-                  type="button"
+                <Button
+                  variant="outline"
+                  size="xs"
+                  loading={reconnecting}
                   onClick={() => onReconnect(account.id)}
-                  disabled={reconnecting}
-                  className="shrink-0 cursor-pointer rounded-md border border-kumo-line px-2 py-1 text-[12px] leading-4 font-medium tracking-[-0.2px] text-kumo-default transition-colors hover:bg-kumo-elevated disabled:cursor-not-allowed disabled:opacity-60"
+                  className="shrink-0"
                 >
                   {reconnecting ? 'Opening...' : 'Reconnect'}
-                </button>
+                </Button>
               ) : needsAccess ? (
-                <button
-                  type="button"
+                <Button
+                  variant="outline"
+                  size="xs"
+                  loading={granting}
                   onClick={() => onGrantAccess?.(account.id)}
-                  disabled={granting}
-                  className="shrink-0 cursor-pointer rounded-md border border-kumo-line px-2 py-1 text-[12px] leading-4 font-medium tracking-[-0.2px] text-kumo-default transition-colors hover:bg-kumo-elevated disabled:cursor-not-allowed disabled:opacity-60"
+                  className="shrink-0"
                 >
                   {granting ? 'Opening...' : 'Grant access'}
-                </button>
+                </Button>
               ) : null}
               {selected && <Check size={15} weight="bold" className="shrink-0 text-kumo-brand" />}
             </div>
@@ -140,21 +143,17 @@ export function AccountChooser({
         })}
 
         {(!isEmailMailbox || accounts.length === 0) && (
-          <button
-            type="button"
+          <Button
+            variant="ghost"
+            icon={<Plus size={14} />}
+            loading={connecting}
             onClick={onConnect}
-            disabled={connecting}
-            className="flex w-full cursor-pointer items-center gap-2 px-3 py-2.5 text-left text-[12px] leading-4 font-medium tracking-[-0.2px] text-kumo-subtle transition-colors hover:bg-kumo-elevated hover:text-kumo-default disabled:cursor-not-allowed disabled:opacity-60"
+            className="!w-full !justify-start !px-3 !py-2.5 !text-[12px] !text-kumo-subtle hover:!text-kumo-default"
           >
-            {connecting ? (
-              <span className="h-3.5 w-3.5 rounded-full border-2 border-kumo-brand border-t-transparent animate-spin" />
-            ) : (
-              <Plus size={14} />
-            )}
             {isEmailMailbox
               ? 'Enable Email mailboxes'
               : accounts.length === 0 ? `Connect ${vendorName}` : `Use another ${vendorName} account`}
-          </button>
+          </Button>
         )}
       </div>
     </section>
