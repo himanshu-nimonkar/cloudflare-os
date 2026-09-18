@@ -50,8 +50,6 @@ describe("MarkdownMessage line breaks", () => {
     vi.stubGlobal("navigator", { clipboard: { writeText } });
     await render("```ts\nconst answer = 42;\n```");
 
-    // Kumo's Button renders `title` as a Tooltip rather than a native title attribute, so
-    // the accessible name (aria-label, asserted by the selector matching) is what to check.
     const button = container.querySelector<HTMLButtonElement>(
       'button[aria-label="Copy code"]',
     );
