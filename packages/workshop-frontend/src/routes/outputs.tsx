@@ -1,6 +1,6 @@
 import { createFileRoute, useNavigate } from '@tanstack/react-router'
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { Dialog, DropdownMenu, useKumoToastManager } from '@cloudflare/kumo'
+import { Dialog, DropdownMenu, Input, InputGroup, useKumoToastManager } from '@cloudflare/kumo'
 import {
   MagnifyingGlass,
   DotsThreeVertical,
@@ -358,16 +358,13 @@ function RenameOutputDialog({
             </WorkshopIconButton>
           </div>
           <div className="px-5 py-4">
-            <label className="block text-[12px] font-medium text-kumo-subtle" htmlFor="rename-output-title">
-              Name
-            </label>
-            <input
+            <Input
               id="rename-output-title"
+              label="Name"
               autoFocus
               value={value}
               disabled={busy}
               onChange={(event) => onValueChange(event.target.value)}
-              className="mt-1.5 h-9 w-full rounded-lg border border-kumo-line bg-kumo-base px-3 text-[13px] text-kumo-default focus:border-kumo-ring focus:outline-none focus:ring-[3px] focus:ring-kumo-ring/15"
             />
           </div>
           <div className="flex items-center justify-end gap-2 border-t border-kumo-line px-5 py-3">
@@ -617,16 +614,18 @@ function OutputsPage() {
               onChange={setOwnerFilter}
             />
           )}
-          <div className="relative min-w-0 flex-1 sm:w-56 sm:flex-none">
-            <MagnifyingGlass size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-kumo-inactive" />
-            <input
+          <InputGroup className="min-w-0 flex-1 sm:w-56 sm:flex-none">
+            <InputGroup.Addon align="start">
+              <MagnifyingGlass size={16} />
+            </InputGroup.Addon>
+            <InputGroup.Input
+              aria-label="Search outputs"
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search outputs…"
-              className="h-10 w-full rounded-lg border border-kumo-line bg-kumo-base pl-9 pr-4 text-[16px] text-kumo-default placeholder:text-kumo-inactive transition-[border-color,box-shadow] duration-150 ease-out focus:border-kumo-ring focus:outline-none focus:ring-[3px] focus:ring-kumo-ring/15 sm:h-9 sm:text-[13px]"
             />
-          </div>
+          </InputGroup>
         </div>
       </div>
 

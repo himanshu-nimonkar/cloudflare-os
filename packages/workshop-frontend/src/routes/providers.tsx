@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { useState, useEffect, useRef } from 'react'
-import { DropdownMenu, useKumoToastManager } from '@cloudflare/kumo'
+import { DropdownMenu, InputGroup, useKumoToastManager } from '@cloudflare/kumo'
 import { useAuthenticatedApi } from '../AuthContext'
 import {
   AiChatAuthorInfo,
@@ -230,16 +230,18 @@ function ProvidersPage() {
       {/* Search — hidden when the user has no models */}
       {!loading && !loadError && models.length > 0 && (
         <div className="mb-3 px-3">
-          <div className="relative">
-            <MagnifyingGlass size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-kumo-inactive" />
-            <input
+          <InputGroup>
+            <InputGroup.Addon align="start">
+              <MagnifyingGlass size={16} />
+            </InputGroup.Addon>
+            <InputGroup.Input
+              aria-label="Search providers"
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search providers…"
-              className="h-9 w-full rounded-lg border border-kumo-line bg-kumo-base pl-9 pr-4 text-[13px] tracking-[-0.25px] text-kumo-default placeholder:text-kumo-inactive transition-[border-color,box-shadow] duration-150 ease-out focus:border-kumo-ring focus:outline-none focus:ring-[3px] focus:ring-kumo-ring/15"
             />
-          </div>
+          </InputGroup>
         </div>
       )}
 

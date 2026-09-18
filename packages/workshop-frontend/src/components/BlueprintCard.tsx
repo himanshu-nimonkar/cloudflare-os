@@ -1,4 +1,5 @@
 import { Link } from "@tanstack/react-router";
+import { Badge } from "@cloudflare/kumo";
 import {
   Hexagon,
   Robot,
@@ -97,10 +98,9 @@ export function BindingBadge({
   }
 
   return (
-    <span className="inline-flex items-center gap-1 rounded-full bg-kumo-fill px-2 py-[3px] text-[11px] font-medium leading-none tracking-[-0.1px] text-kumo-subtle">
-      <span className="flex items-center text-kumo-inactive">{icon}</span>
+    <Badge variant="secondary" icon={<span className="text-kumo-inactive">{icon}</span>}>
       {vendorDescription?.displayName ?? badge.label}
-    </span>
+    </Badge>
   );
 }
 

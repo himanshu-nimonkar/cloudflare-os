@@ -1,7 +1,7 @@
 import { Link } from '@tanstack/react-router'
 import { Clock, MagnifyingGlass, Hexagon, DotsThreeVertical, ShareNetwork, Trash, Info, Star, Pencil, ArrowRight } from '@phosphor-icons/react'
 import { useState, useEffect, useRef } from 'react'
-import { DropdownMenu, Dialog, Button, useKumoToastManager } from '@cloudflare/kumo'
+import { DropdownMenu, Dialog, Button, InputGroup, useKumoToastManager } from '@cloudflare/kumo'
 import { RpcStub } from 'capnweb'
 import { useAuthenticatedApi } from '../AuthContext'
 import { GadgetMetadataWithTimestamps, BlueprintPublicInfo, Overseer, AiChatAuthorInfo } from '@gadgets/workshop-shared/api'
@@ -349,19 +349,18 @@ export default function GadgetList({ showHeader = true }: { showHeader?: boolean
       {/* Search — hidden when the user has no gadgets */}
       {!loading && gadgets.length > 0 && (
         <div className="mb-4 px-3">
-          <div className="relative">
-            <MagnifyingGlass
-              size={16}
-              className="absolute left-3 top-1/2 -translate-y-1/2 text-kumo-inactive"
-            />
-            <input
+          <InputGroup>
+            <InputGroup.Addon align="start">
+              <MagnifyingGlass size={16} />
+            </InputGroup.Addon>
+            <InputGroup.Input
+              aria-label="Search workspaces"
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search workspaces…"
-              className="h-9 w-full rounded-lg border border-kumo-line bg-kumo-base pl-9 pr-4 text-[13px] tracking-[-0.25px] text-kumo-default placeholder:text-kumo-inactive transition-[border-color,box-shadow] duration-150 ease-out focus:border-kumo-ring focus:outline-none focus:ring-[3px] focus:ring-kumo-ring/15"
             />
-          </div>
+          </InputGroup>
         </div>
       )}
 
