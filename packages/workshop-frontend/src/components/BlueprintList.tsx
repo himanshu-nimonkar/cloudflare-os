@@ -61,11 +61,7 @@ function BlueprintRow({
   onRemoveFromLibrary: (b: BlueprintItem) => void
 }) {
   return (
-    <Link
-      to="/blueprint/$id"
-      params={{ id: item.id }}
-      className="group flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 transition-colors duration-150 ease-out hover:bg-kumo-tint"
-    >
+    <div className="group relative flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 transition-colors duration-150 ease-out hover:bg-kumo-tint">
       {/* Neutral monogram */}
       <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-kumo-fill text-kumo-subtle">
         <BlueprintIcon size={16} weight="regular" />
@@ -75,7 +71,10 @@ function BlueprintRow({
         <div className="flex items-center gap-2">
           {item.pinned && <Star size={12} weight="fill" className="flex-shrink-0 text-kumo-brand" />}
           <h3 className="truncate text-sm font-medium text-kumo-default">
-            {item.title || 'Untitled blueprint'}
+            {/* after:inset-0 stretches the link over the whole row; the actions menu sits above it. */}
+            <Link to="/blueprint/$id" params={{ id: item.id }} className="after:absolute after:inset-0">
+              {item.title || 'Untitled blueprint'}
+            </Link>
           </h3>
         </div>
         {item.description && (
@@ -88,9 +87,7 @@ function BlueprintRow({
         {formatRelativeTime(new Date(item.recency))}
       </span>
 
-      {/* Inside the row's <Link>: stopPropagation blocks the Link's SPA handler, so preventDefault
-          is needed to stop the native <a> from navigating. */}
-      <div onClick={(e) => { e.stopPropagation(); e.preventDefault() }}>
+      <div className="relative">
         <DropdownMenu>
           <DropdownMenu.Trigger
             render={
@@ -116,7 +113,7 @@ function BlueprintRow({
           </DropdownMenu.Content>
         </DropdownMenu>
       </div>
-    </Link>
+    </div>
   )
 }
 
