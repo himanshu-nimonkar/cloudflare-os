@@ -75,7 +75,7 @@ export default function LoginPage({ rpcStub, onLoginSuccess }: LoginPageProps) {
     return (
       <div className="flex h-full min-h-0 flex-col items-center justify-center gap-4 overflow-y-auto bg-kumo-base px-4 py-8">
         <Loader size="lg" />
-        <p className="text-sm text-kumo-subtle text-center">
+        <p role="status" className="text-sm text-kumo-subtle text-center">
           {connectionLost ? "Can't reach the server. Retrying…" : 'Loading…'}
         </p>
       </div>
