@@ -313,7 +313,7 @@ export default function Connections({ overseer, gadget, chatId, authenticatedApi
                             <span className="min-w-0 truncate">{gk.resourceTitle}</span>
                             {isPending && (
                               <Tooltip content="Added in this chat; kept when you accept the chat's changes" asChild>
-                                <span className="flex-shrink-0 rounded-full bg-kumo-fill px-1.5 py-0.5 text-[10px] leading-none font-medium text-kumo-subtle">
+                                <span className="flex-shrink-0 rounded-full bg-kumo-fill px-1.5 py-0.5 text-[11px] leading-none font-medium text-kumo-subtle">
                                   Draft
                                 </span>
                               </Tooltip>

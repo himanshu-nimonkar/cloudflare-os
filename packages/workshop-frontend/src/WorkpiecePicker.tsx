@@ -157,7 +157,7 @@ export default function WorkpiecePicker({
                   )}
                   {isPending && (
                     expanded ? (
-                      <span className="flex-shrink-0 rounded-full bg-kumo-base px-1.5 py-0.5 text-[10px] leading-none font-medium text-kumo-subtle">
+                      <span className="flex-shrink-0 rounded-full bg-kumo-base px-1.5 py-0.5 text-[11px] leading-none font-medium text-kumo-subtle">
                         Draft
                       </span>
                     ) : (

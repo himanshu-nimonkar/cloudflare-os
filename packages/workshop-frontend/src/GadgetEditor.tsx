@@ -223,7 +223,7 @@ function PaneLabel({
         : workpiece && <WorkpieceGlyph summary={workpiece} className="flex-shrink-0" />}
       <span className="truncate">{title}</span>
       {badge !== undefined && (
-        <span className="rounded-full bg-kumo-fill px-1.5 py-0.5 text-[10px] font-medium leading-none text-kumo-subtle">
+        <span className="rounded-full bg-kumo-fill px-1.5 py-0.5 text-[11px] font-medium leading-none text-kumo-subtle">
           {badge}
         </span>
       )}
@@ -309,7 +309,7 @@ function PaneWorkpieceTabs({
             <WorkpieceGlyph summary={gadget} className="flex-shrink-0" />
             <span className="truncate">{gadget.title}</span>
             {gadget.type === 'gadget' && gadget.chatId !== undefined && (
-              <span className="flex-shrink-0 rounded-full bg-kumo-fill px-1.5 py-0.5 text-[10px] font-medium leading-none text-kumo-subtle">
+              <span className="flex-shrink-0 rounded-full bg-kumo-fill px-1.5 py-0.5 text-[11px] font-medium leading-none text-kumo-subtle">
                 Draft
               </span>
             )}

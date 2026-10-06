@@ -1085,7 +1085,7 @@ export default function ShareModal({ open, onClose, overseer, metadata, currentU
                 >
                   <span className="truncate">{recipient.name}</span>
                   {recipient.name !== recipient.id && (
-                    <span className="truncate font-mono text-[10px] text-kumo-subtle">{recipient.id}</span>
+                    <span className="truncate font-mono text-[11px] text-kumo-subtle">{recipient.id}</span>
                   )}
                   <button
                     type="button"
