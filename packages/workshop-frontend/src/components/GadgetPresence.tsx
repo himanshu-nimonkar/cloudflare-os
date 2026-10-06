@@ -217,7 +217,7 @@ export function GadgetPresence({
                 {overflow > 0 && (
                   <span data-flip-id="__overflow" className="inline-flex cursor-pointer">
                     <span
-                      className="presence-pop-in grid h-[26px] w-[26px] place-items-center rounded-full bg-kumo-tint text-[10px] font-semibold text-kumo-strong ring-2 ring-kumo-base"
+                      className="presence-pop-in grid h-[26px] w-[26px] place-items-center rounded-full bg-kumo-tint text-[11px] font-semibold text-kumo-strong ring-2 ring-kumo-base"
                     >
                       +{overflow}
                     </span>
