@@ -708,7 +708,7 @@ export const ChatComposer = ({
           into the canvas; the lift intensifies a touch on focus. */}
       <div
         ref={promptCardRef}
-        className="relative overflow-visible rounded-2xl bg-kumo-control shadow-md ring ring-kumo-hairline shadow-black/4 transition-shadow duration-150 ease-out focus-within:shadow-lg"
+        className="relative overflow-visible rounded-2xl bg-kumo-control shadow-md ring ring-kumo-hairline shadow-black/4 transition-shadow duration-150 ease-out focus-within:shadow-lg has-[textarea:focus-visible]:outline-2 has-[textarea:focus-visible]:outline-offset-2 has-[textarea:focus-visible]:outline-kumo-contrast"
         onDragEnter={handleAttachmentDragEnter}
         onDragOver={handleAttachmentDragOver}
         onDragLeave={handleAttachmentDragLeave}
