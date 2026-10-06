@@ -147,7 +147,7 @@ export default function OAuthButtons({ rpcStub, vendors, onSuccess }: OAuthButto
 
   return (
     <div className="space-y-3">
-      {error && <Banner variant="error" title={error} />}
+      {error && <Banner role="alert" variant="error" title={error} />}
       {vendors.map((vendor) => (
         <Button
           key={vendor.vendorId}

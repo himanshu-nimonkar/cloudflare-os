@@ -137,7 +137,7 @@ export default function LoginPage({ rpcStub, onLoginSuccess }: LoginPageProps) {
               />
 
               {error && (
-                <Banner variant="error" title={error} />
+                <Banner role="alert" variant="error" title={error} />
               )}
 
               <Button
@@ -171,7 +171,7 @@ export default function LoginPage({ rpcStub, onLoginSuccess }: LoginPageProps) {
               </div>
             )}
             {!passwordAuthEnabled && error && (
-              <Banner variant="error" title={error} className="mb-4" />
+              <Banner role="alert" variant="error" title={error} className="mb-4" />
             )}
             <OAuthButtons rpcStub={rpcStub} vendors={authVendors} onSuccess={onLoginSuccess} />
           </div>

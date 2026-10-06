@@ -186,7 +186,7 @@ export default function SignupPage({ rpcStub }: SignupPageProps) {
                 error={confirmError}
               />
 
-              {error && <Banner variant="error" title={error} />}
+              {error && <Banner role="alert" variant="error" title={error} />}
 
               <Button
                 type="submit"
