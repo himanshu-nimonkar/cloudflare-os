@@ -157,7 +157,7 @@ export default function LoginPage({ rpcStub, onLoginSuccess }: LoginPageProps) {
               <Link
                 to="/signup"
                 search={deviceSessionSearch(window.location.search)}
-                className="text-kumo-brand hover:underline font-medium"
+                className="text-kumo-brand underline hover:no-underline font-medium"
               >
                 Create one
               </Link>
