@@ -879,6 +879,19 @@ html {
   }
 }
 
+/* Only some animations above carry their own reduced-motion guard. This covers the rest: Tailwind's
+   pulse, Kumo's skeletons and shimmer, slide/bounce/toast entrances and the thinking bar. Spinners
+   keep turning because a frozen one no longer says "loading". */
+@media (prefers-reduced-motion: reduce) {
+  *:not(.animate-spin),
+  *:not(.animate-spin)::before,
+  *:not(.animate-spin)::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+  }
+}
+
 /* Kumo Select: use text-sm consistently for trigger and dropdown options.
    The trigger can be overridden via className, but the dropdown options have
    hardcoded text-base with no override mechanism — this global rule fixes it. */
