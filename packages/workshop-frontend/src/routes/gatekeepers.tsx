@@ -129,7 +129,7 @@ function ConnectorCard({
 
   const badgeEl = badge ? (
     <span
-      className={`shrink-0 rounded-full px-1.5 py-0.5 text-[10px] leading-3 font-semibold uppercase tracking-[0.4px] ${
+      className={`shrink-0 rounded-full px-1.5 py-0.5 text-[11px] leading-3 font-semibold uppercase tracking-[0.4px] ${
         badge.tone === 'new'
           ? 'bg-[rgba(255,72,1,0.10)] text-kumo-brand'
           : 'bg-kumo-tint text-kumo-subtle'
