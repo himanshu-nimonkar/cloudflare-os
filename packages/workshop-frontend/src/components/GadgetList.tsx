@@ -72,15 +72,7 @@ function AppRow({
   }
 
   return (
-    <Link
-      to="/workspace/$id"
-      params={{ id: gadget.id }}
-      className="group flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 transition-colors duration-150 ease-out hover:bg-kumo-tint"
-      onClick={(e) => {
-        // Prevent navigation when renaming or clicking the menu
-        if (isRenaming) e.preventDefault()
-      }}
-    >
+    <div className="group relative flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 transition-colors duration-150 ease-out hover:bg-kumo-tint">
       {/* Neutral monogram */}
       <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-kumo-fill text-[12px] font-medium text-kumo-subtle">
         {initials(gadget.title)}
@@ -102,11 +94,13 @@ function AppRow({
                 if (e.key === 'Escape') setIsRenaming(false)
               }}
               className="text-sm font-medium text-kumo-default bg-transparent border-b border-kumo-brand outline-none w-full min-w-0"
-              onClick={(e) => e.preventDefault()}
             />
           ) : (
             <h3 className="text-sm font-medium text-kumo-default truncate">
-              {gadget.title || 'Untitled Workspace'}
+              {/* after:inset-0 stretches the link over the whole row; the actions menu sits above it. */}
+              <Link to="/workspace/$id" params={{ id: gadget.id }} className="after:absolute after:inset-0">
+                {gadget.title || 'Untitled Workspace'}
+              </Link>
             </h3>
           )}
         </div>
@@ -123,8 +117,7 @@ function AppRow({
         {formatRelativeTime(gadget.lastActive)}
       </span>
 
-      {/* Overflow menu — wrapper stops clicks from reaching the parent Link */}
-      <div onClick={(e) => { e.stopPropagation(); e.preventDefault() }}>
+      <div className="relative">
       <DropdownMenu>
         <DropdownMenu.Trigger
           render={
@@ -164,7 +157,7 @@ function AppRow({
         </DropdownMenu.Content>
       </DropdownMenu>
       </div>
-    </Link>
+    </div>
   )
 }
 
