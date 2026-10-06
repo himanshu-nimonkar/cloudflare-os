@@ -17,6 +17,7 @@ export interface CapsuleOverlayProps {
   onRefine?: (newUrl: string, placeholderStart: number, placeholderEnd: number) => void
   onDismiss: () => void
   activeIndex?: number
+  listboxId?: string
   onItems?: (items: SelectableItem[]) => void
   activateRef?: MutableRefObject<((index: number) => void) | null>
   /**
@@ -40,7 +41,7 @@ const OVERLAY_VIEWPORT_MARGIN = 24
 // Below this the panel is more frustrating than useful, so it is allowed to overflow instead.
 const MIN_OVERLAY_HEIGHT = 160
 
-export default function CapsuleOverlay({ url, onSelectAccount, onRefine, onDismiss, activeIndex, onItems, activateRef, lineOffset }: CapsuleOverlayProps) {
+export default function CapsuleOverlay({ url, onSelectAccount, onRefine, onDismiss, activeIndex, listboxId, onItems, activateRef, lineOffset }: CapsuleOverlayProps) {
   const { authenticatedApi } = useAuthenticatedApi()
   const overlayRef = useRef<HTMLDivElement>(null)
   const footerRef = useRef<HTMLParagraphElement>(null)
@@ -97,6 +98,7 @@ export default function CapsuleOverlay({ url, onSelectAccount, onRefine, onDismi
         compact
         maxHeight={maxHeight}
         activeIndex={activeIndex}
+        listboxId={listboxId}
         onItems={onItems}
         activateRef={activateRef}
       />
