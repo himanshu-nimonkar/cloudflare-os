@@ -226,7 +226,7 @@ function ConnectorCard({
           </div>
         )}
         {tagline && (
-          <p className="mt-2 line-clamp-2 text-[13px] leading-[18px] font-normal tracking-[-0.25px] text-kumo-subtle">
+          <p className="mt-2 line-clamp-2 max-md:line-clamp-none text-[13px] leading-[18px] font-normal tracking-[-0.25px] text-kumo-subtle">
             {tagline}
           </p>
         )}

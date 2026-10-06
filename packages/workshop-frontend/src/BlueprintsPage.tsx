@@ -196,7 +196,7 @@ function FeaturedBlueprintCard({
             {blueprint.metadata.title}
           </p>
           <p
-            className={`mt-0.5 line-clamp-1 text-[12px] leading-4 tracking-[-0.2px] ${
+            className={`mt-0.5 line-clamp-1 max-md:line-clamp-none text-[12px] leading-4 tracking-[-0.2px] ${
               blueprint.metadata.description ? "text-kumo-subtle" : "italic text-kumo-inactive"
             }`}
           >
@@ -242,7 +242,7 @@ function FeaturedBlueprintRow({
           {blueprint.metadata.title}
         </p>
         <p
-          className={`mt-0.5 line-clamp-1 text-[12px] leading-4 tracking-[-0.2px] ${
+          className={`mt-0.5 line-clamp-1 max-md:line-clamp-none text-[12px] leading-4 tracking-[-0.2px] ${
             blueprint.metadata.description ? "text-kumo-subtle" : "italic text-kumo-inactive"
           }`}
         >

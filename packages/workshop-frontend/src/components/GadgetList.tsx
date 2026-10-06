@@ -513,7 +513,7 @@ function HomeFeaturedBlueprintCard({
             <p className="m-0 truncate text-[13px] leading-[18px] font-semibold tracking-[-0.25px] text-kumo-default">
               {blueprint.metadata.title}
             </p>
-            <p className={`mt-0.5 line-clamp-2 min-h-8 text-[12px] leading-4 tracking-[-0.2px] ${blueprint.metadata.description ? 'text-kumo-subtle' : 'text-kumo-inactive italic'}`}>
+            <p className={`mt-0.5 line-clamp-2 max-md:line-clamp-none min-h-8 text-[12px] leading-4 tracking-[-0.2px] ${blueprint.metadata.description ? 'text-kumo-subtle' : 'text-kumo-inactive italic'}`}>
               {blueprint.metadata.description || 'No description'}
             </p>
             {badges.length > 0 && (
