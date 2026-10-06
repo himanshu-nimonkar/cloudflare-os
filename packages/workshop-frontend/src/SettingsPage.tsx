@@ -63,6 +63,7 @@ function PasswordField({
           type={show ? 'text' : 'password'}
           value={value}
           onChange={(e) => onChange(e.target.value)}
+          aria-label={label}
           placeholder={placeholder}
           autoComplete={autoComplete}
           className={`${INPUT} pr-10 ${error ? 'border-kumo-danger focus:border-kumo-danger' : ''}`}
@@ -424,6 +425,7 @@ export default function SettingsPage() {
                       if (e.key === 'Enter') handleSaveName()
                       if (e.key === 'Escape') handleCancelEdit()
                     }}
+                    aria-label="Display name"
                     placeholder="Enter display name"
                     autoFocus
                     className={`mt-1.5 ${INPUT}`}
