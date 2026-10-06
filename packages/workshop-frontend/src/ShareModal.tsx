@@ -1092,7 +1092,7 @@ export default function ShareModal({ open, onClose, overseer, metadata, currentU
                     aria-label={`Remove ${recipientLabel(recipient)}`}
                     onClick={() => removeStaged(recipient)}
                     disabled={adding}
-                    className="grid h-4 w-4 shrink-0 cursor-pointer place-items-center rounded-full opacity-60 transition-opacity hover:opacity-100 focus-visible:opacity-100 disabled:cursor-not-allowed"
+                    className="-m-1 grid h-6 w-6 shrink-0 cursor-pointer place-items-center rounded-full opacity-60 transition-opacity hover:opacity-100 focus-visible:opacity-100 disabled:cursor-not-allowed"
                   >
                     <X size={10} weight="bold" />
                   </button>

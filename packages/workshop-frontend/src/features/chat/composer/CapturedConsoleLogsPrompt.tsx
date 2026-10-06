@@ -54,7 +54,7 @@ export const CapturedConsoleLogsPrompt = ({
         <button
           type="button"
           onClick={onDiscard}
-          className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full opacity-60 transition-opacity hover:bg-kumo-tint hover:opacity-100"
+          className="-my-1 flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full opacity-60 transition-opacity hover:bg-kumo-tint hover:opacity-100"
           aria-label="Discard captured logs"
         >
           <X size={10} />

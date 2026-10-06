@@ -44,7 +44,7 @@ const OUTLINE_CLASS =
 // capability rather than viewport width, which would also hide it on tablets. `group-hover` is
 // already limited to hover-capable devices by Tailwind.
 const REMOVE_BUTTON_CLASS =
-  "absolute right-1.5 top-1.5 flex h-5 w-5 cursor-pointer items-center justify-center rounded-full bg-kumo-base text-kumo-default shadow-sm ring-1 ring-kumo-line hover:bg-kumo-tint focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-kumo-ring disabled:cursor-not-allowed disabled:opacity-50 [@media(hover:hover)]:opacity-0 group-hover:opacity-100";
+  "absolute right-1 top-1 flex h-6 w-6 cursor-pointer items-center justify-center rounded-full bg-kumo-base text-kumo-default shadow-sm ring-1 ring-kumo-line hover:bg-kumo-tint focus-visible:opacity-100 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-kumo-ring disabled:cursor-not-allowed disabled:opacity-50 [@media(hover:hover)]:opacity-0 group-hover:opacity-100";
 
 export const ComposerAttachmentCard = ({
   attachment,
