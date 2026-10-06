@@ -894,6 +894,17 @@ html {
   }
 }
 
+/* Tell screen-reader users that a link opens a new tab. Visually hidden, so layout is unchanged. */
+a[target="_blank"]::after {
+  content: " (opens in a new tab)";
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
 /* Keep the app header from sitting above modal backdrops without depending on
    Kumo's internal backdrop class names. */
 body:has([role="dialog"], [role="alertdialog"]) .app-header {
