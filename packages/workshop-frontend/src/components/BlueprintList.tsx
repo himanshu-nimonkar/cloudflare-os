@@ -96,6 +96,7 @@ function BlueprintRow({
             render={
               <button
                 type="button"
+                aria-label={`Actions for ${item.title || 'Untitled blueprint'}`}
                 className="rounded-md p-1.5 text-kumo-subtle transition-colors hover:bg-kumo-fill hover:text-kumo-default focus:opacity-100 sm:opacity-0 sm:group-hover:opacity-100"
               >
                 <DotsThreeVertical size={16} />
