@@ -816,7 +816,7 @@ export default function BlueprintLandingPage({ rpcStub }: Props) {
             </div>
           </div>
 
-          <aside className="space-y-3 lg:w-[360px] lg:justify-self-end lg:pt-1">
+          <aside aria-label="Blueprint preview and actions" className="space-y-3 lg:w-[360px] lg:justify-self-end lg:pt-1">
             {blueprint.screenshotUrl && (
               <BlueprintScreenshotHero
                 title={meta.title}
@@ -948,7 +948,7 @@ export default function BlueprintLandingPage({ rpcStub }: Props) {
           </aside>
         </header>
 
-        <main className="space-y-6">
+        <div className="space-y-6">
           {bindingEntries.length > 0 ? (
             <section>
               <div className="mb-2 flex items-center gap-2 px-1">
@@ -995,7 +995,7 @@ export default function BlueprintLandingPage({ rpcStub }: Props) {
               <button onClick={() => setError(null)} className="cursor-pointer text-kumo-danger hover:text-kumo-default">&times;</button>
             </div>
           )}
-        </main>
+        </div>
       </div>
 
       <Dialog.Root
