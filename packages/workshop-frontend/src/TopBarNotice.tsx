@@ -21,7 +21,7 @@ const INLINE_MARKDOWN_COMPONENTS: Components = {
       href={href}
       target="_blank"
       rel="noopener noreferrer"
-      className="text-kumo-brand hover:underline pointer-events-auto"
+      className="text-kumo-brand underline hover:no-underline pointer-events-auto"
     >
       {children}
     </a>

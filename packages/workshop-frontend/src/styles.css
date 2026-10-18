@@ -67,10 +67,12 @@
   --text-color-kumo-default-hover: #100f0d;
   --text-color-kumo-inverse: #ffffff;
   --text-color-kumo-strong: #100f0d;
-  --text-color-kumo-subtle: oklch(52% 0.006 60);
-  --text-color-kumo-inactive: oklch(66% 0.005 60);
-  --text-color-kumo-brand: #ff4801;
-  --text-color-kumo-link: #ff4801;
+  /* Both were under 4.5:1 on the tinted/gray surfaces (inactive 2.7-3.0:1, subtle 4.46:1 on kumo-fill). */
+  --text-color-kumo-subtle: oklch(50% 0.006 60);
+  --text-color-kumo-inactive: oklch(53% 0.005 60);
+  /* Darker than the brand fill: #ff4801 is only 3.3:1 on the page background, below the 4.5:1 text minimum. */
+  --text-color-kumo-brand: #c43700;
+  --text-color-kumo-link: #c43700;
   --text-color-kumo-success: oklch(72.3% 0.219 149.579);
   --text-color-kumo-danger: oklch(63.7% 0.237 25.331);
   --text-color-kumo-warning: oklch(47.6% 0.114 61.907);

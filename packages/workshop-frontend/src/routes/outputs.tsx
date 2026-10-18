@@ -588,7 +588,7 @@ function OutputsPage() {
           refining controls). Configured categories stay visible with zero counts. */}
       <div className={`flex flex-col gap-3 px-3 pb-3 sm:flex-row sm:items-center sm:justify-between ${
         !showToolbar ? 'hidden' : ''}`}>
-        <div className="-mx-1 flex items-center gap-1 overflow-x-auto px-1 sidebar-scroll">
+        <div className="-mx-1 flex flex-wrap items-center gap-1 px-1 sm:flex-nowrap sm:overflow-x-auto sidebar-scroll">
           {showTypeFilters && (
             <>
               <FilterChip active={typeFilter === 'all'} label="All" count={inTypeScope.length}
@@ -605,7 +605,7 @@ function OutputsPage() {
             </>
           )}
         </div>
-        <div className="flex min-w-0 items-center gap-2 sm:shrink-0">
+        <div className="flex min-w-0 flex-wrap items-center gap-2 sm:shrink-0 sm:flex-nowrap">
           {showOwnerFilters && (
             <ScopeSelect
               value={ownerFilter}
@@ -617,7 +617,7 @@ function OutputsPage() {
               onChange={setOwnerFilter}
             />
           )}
-          <div className="relative min-w-0 flex-1 sm:w-56 sm:flex-none">
+          <div className="relative min-w-[9rem] flex-1 sm:w-56 sm:flex-none">
             <MagnifyingGlass size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-kumo-inactive" />
             <input
               type="text"
