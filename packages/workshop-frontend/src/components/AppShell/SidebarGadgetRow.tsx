@@ -59,16 +59,16 @@ export default function SidebarGadgetRow({
   const muteDescription = describeMute(gadget.notificationMute)
 
   return (
-    <Link
-      to="/workspace/$id"
-      params={{ id: gadget.id }}
-      className="group flex h-8 items-center gap-2 rounded-lg pl-1.5 pr-1 text-[13px] leading-[18px] tracking-[-0.25px] text-kumo-default transition-colors hover:bg-kumo-tint"
-      activeProps={{ className: 'flex h-8 items-center gap-2 rounded-lg pl-1.5 pr-1 text-[13px] leading-[18px] tracking-[-0.25px] bg-kumo-fill text-kumo-strong font-medium' }}
-      onClick={(e) => {
-        if (renaming) e.preventDefault()
-      }}
-      title={collapsed ? gadget.title || 'Untitled workspace' : undefined}
-    >
+    <div className="group relative flex h-8 items-center gap-2 rounded-lg pl-1.5 pr-1 text-[13px] leading-[18px] tracking-[-0.25px] text-kumo-default transition-colors hover:bg-kumo-tint has-[a[aria-current=page]]:bg-kumo-fill has-[a[aria-current=page]]:font-medium has-[a[aria-current=page]]:text-kumo-strong">
+      {!renaming && (
+        <Link
+          to="/workspace/$id"
+          params={{ id: gadget.id }}
+          aria-label={gadget.title || 'Untitled workspace'}
+          title={collapsed ? gadget.title || 'Untitled workspace' : undefined}
+          className="absolute inset-0 rounded-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-kumo-contrast"
+        />
+      )}
       <div
         className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md bg-kumo-fill text-[10px] font-medium text-kumo-subtle"
         aria-hidden="true"
@@ -99,9 +99,7 @@ export default function SidebarGadgetRow({
             <BellSlash size={12} alt={muteDescription} className="shrink-0 text-kumo-inactive" />
           )}
 
-          {/* Inside the row's <Link>: stopPropagation blocks the Link's SPA handler, so preventDefault
-              is needed to stop the native <a> from navigating. */}
-          <div onClick={(e) => { e.stopPropagation(); e.preventDefault() }}>
+          <div className="relative">
             <DropdownMenu>
               <DropdownMenu.Trigger
                 render={
@@ -153,9 +151,6 @@ export default function SidebarGadgetRow({
           </div>
         </>
       )}
-
-      {/* Collapsed rows show only the monogram (aria-hidden), so name the link for screen readers. */}
-      {collapsed && <span className="sr-only">{gadget.title || 'Untitled workspace'}</span>}
-    </Link>
+    </div>
   )
 }
