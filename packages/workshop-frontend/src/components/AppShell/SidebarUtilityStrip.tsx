@@ -56,7 +56,7 @@ function StripLink({
   const pathname = useRouterState({ select: (s) => s.location.pathname })
   const active = pathname === to
   return (
-    <Tooltip content={label}>
+    <Tooltip content={label} asChild>
       <Link
         to={to}
         aria-label={label}
