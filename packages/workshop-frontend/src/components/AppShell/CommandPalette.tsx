@@ -361,7 +361,7 @@ export default function CommandPalette({
             placeholder="Search workspaces and actions…"
             className="h-12 w-full bg-transparent text-[14px] leading-5 tracking-[-0.25px] text-kumo-default placeholder:text-kumo-inactive focus:outline-none"
           />
-          <kbd className="shrink-0 rounded border border-kumo-line px-1.5 py-0.5 font-sans text-[10px] leading-none text-kumo-inactive">
+          <kbd className="shrink-0 rounded border border-kumo-line px-1.5 py-0.5 font-sans text-[11px] leading-none text-kumo-inactive">
             ESC
           </kbd>
         </div>
