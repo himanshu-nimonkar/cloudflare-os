@@ -1021,7 +1021,7 @@ function ConnectionTypeRow({
         <p className="truncate text-[13px] leading-[18px] font-medium tracking-[-0.25px] text-kumo-default">
           {connection.title}
         </p>
-        <p className="mt-0.5 line-clamp-1 text-[12px] leading-4 font-normal tracking-[-0.2px] text-kumo-subtle">
+        <p className="mt-0.5 line-clamp-1 max-md:line-clamp-none text-[12px] leading-4 font-normal tracking-[-0.2px] text-kumo-subtle">
           {connection.vendor} · {connection.description}
         </p>
       </div>
@@ -1100,7 +1100,7 @@ function ConnectionGroupRow({
           <p className="truncate text-[13px] leading-[18px] font-medium tracking-[-0.25px] text-kumo-default">
             {label}
           </p>
-          <p className="mt-0.5 line-clamp-1 text-[12px] leading-4 font-normal tracking-[-0.2px] text-kumo-subtle">
+          <p className="mt-0.5 line-clamp-1 max-md:line-clamp-none text-[12px] leading-4 font-normal tracking-[-0.2px] text-kumo-subtle">
             {subtitle}
           </p>
         </div>
@@ -1132,7 +1132,7 @@ function ConnectionGroupRow({
                 <p className="truncate text-[12.5px] leading-[18px] font-medium tracking-[-0.25px] text-kumo-default">
                   {item.title}
                 </p>
-                <p className="mt-0.5 line-clamp-1 text-[11.5px] leading-4 font-normal tracking-[-0.2px] text-kumo-subtle">
+                <p className="mt-0.5 line-clamp-1 max-md:line-clamp-none text-[11.5px] leading-4 font-normal tracking-[-0.2px] text-kumo-subtle">
                   {item.description}
                 </p>
               </div>

@@ -140,10 +140,10 @@ export function BlueprintCard({
             <Hexagon size={16} className="text-white/75" weight="bold" />
           </div>
           <div className="min-w-0 flex-1">
-            <p className="m-0 line-clamp-2 text-[15px] leading-5 font-medium tracking-[-0.25px] text-kumo-default">
+            <p className="m-0 line-clamp-2 max-md:line-clamp-none text-[15px] leading-5 font-medium tracking-[-0.25px] text-kumo-default">
               {metadata.title}
             </p>
-            <p className={`mt-1.5 line-clamp-2 min-h-8 text-[12px] leading-4 font-normal tracking-[-0.2px] ${metadata.description ? "text-kumo-subtle" : "text-kumo-inactive italic"}`}>
+            <p className={`mt-1.5 line-clamp-2 max-md:line-clamp-none min-h-8 text-[12px] leading-4 font-normal tracking-[-0.2px] ${metadata.description ? "text-kumo-subtle" : "text-kumo-inactive italic"}`}>
               {metadata.description || "No description"}
             </p>
           </div>

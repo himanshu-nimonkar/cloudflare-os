@@ -35,7 +35,7 @@ export default function ProtectedRoute({ children, rpcStub }: ProtectedRouteProp
         }}
       >
         <Loader size="lg" />
-        <div style={{ textAlign: 'center' }}>
+        <div role="status" style={{ textAlign: 'center' }}>
           Loading...
         </div>
       </div>
@@ -84,7 +84,7 @@ export default function ProtectedRoute({ children, rpcStub }: ProtectedRouteProp
           }}
         >
           <Loader size="lg" />
-          <div style={{ textAlign: 'center' }}>
+          <div role="status" style={{ textAlign: 'center' }}>
             Authenticating...
           </div>
         </div>
