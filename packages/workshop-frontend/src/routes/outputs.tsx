@@ -61,6 +61,9 @@ function canModify(output: OutputSummary): boolean {
 
 // ─── rows / cards ────────────────────────────────────────────────────────────
 
+// The title is the keyboard/AT control; after:inset-0 stretches it over the whole card or row (the menu sits above it).
+const OPEN_BUTTON = 'max-w-full cursor-pointer truncate rounded-sm text-left focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-kumo-contrast after:absolute after:inset-0'
+
 function OutputMenu({
   onOpen,
   onOpenWorkspace,
@@ -75,13 +78,7 @@ function OutputMenu({
   onRemove?: () => void
 }) {
   return (
-    <div
-      className="press-exempt"
-      onClick={(e) => { e.stopPropagation() }}
-      // The card/row is itself a keyboard-activatable button; without this, Enter or Space on the
-      // menu trigger would also open the output.
-      onKeyDown={(e) => { e.stopPropagation() }}
-    >
+    <div className="press-exempt relative">
       <DropdownMenu>
         <DropdownMenu.Trigger
           render={
@@ -150,11 +147,7 @@ function OutputCard({
 }: { output: OutputSummary } & OutputActions) {
   return (
     <div
-      role="button"
-      tabIndex={0}
-      onClick={onOpen}
-      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onOpen() } }}
-      className="themed-card-hover-shadow press group flex cursor-pointer flex-col overflow-hidden rounded-xl border border-kumo-line bg-kumo-base text-left transition-[border-color,box-shadow] duration-150 ease-out hover:border-kumo-fill"
+      className="themed-card-hover-shadow press group relative flex cursor-pointer flex-col overflow-hidden rounded-xl border border-kumo-line bg-kumo-base text-left transition-[border-color,box-shadow] duration-150 ease-out hover:border-kumo-fill"
     >
       <div className="relative aspect-[4/3] w-full border-b border-kumo-line">
         <FormatThumbnail output={output.output} />
@@ -163,7 +156,7 @@ function OutputCard({
         <FormatTile output={output.output} size="sm" />
         <div className="min-w-0 flex-1">
           <p className="truncate text-[13px] font-medium leading-[18px] tracking-[-0.25px] text-kumo-default">
-            {output.title || 'Untitled'}
+            <button type="button" onClick={onOpen} className={OPEN_BUTTON}>{output.title || 'Untitled'}</button>
           </p>
           <p className="mt-0.5 truncate text-[12px] leading-4 tracking-[-0.2px] text-kumo-subtle">
             {subtitle(output)}
@@ -181,16 +174,12 @@ function OutputRow({
 }: { output: OutputSummary } & OutputActions) {
   return (
     <div
-      role="button"
-      tabIndex={0}
-      onClick={onOpen}
-      onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); onOpen() } }}
-      className="group flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 transition-colors duration-150 ease-out hover:bg-kumo-tint"
+      className="group relative flex cursor-pointer items-center gap-3 rounded-lg px-3 py-2.5 transition-colors duration-150 ease-out hover:bg-kumo-tint"
     >
       <FormatTile output={output.output} />
       <div className="min-w-0 flex-1">
         <p className="truncate text-sm font-medium tracking-[-0.25px] text-kumo-default">
-          {output.title || 'Untitled'}
+          <button type="button" onClick={onOpen} className={OPEN_BUTTON}>{output.title || 'Untitled'}</button>
         </p>
         <p className="mt-0.5 truncate text-[12px] leading-4 tracking-[-0.2px] text-kumo-subtle">
           {formatOf(output.output).noun} · {output.workspaceTitle || 'Untitled workspace'}
