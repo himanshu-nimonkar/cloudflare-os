@@ -548,11 +548,14 @@ function FileRow({
             {label}
           </span>
           {isStreamingActive && (
-            <span
-              className="h-1.5 w-1.5 shrink-0 rounded-full bg-kumo-success"
-              aria-label={`${path} is being edited`}
-              title="Agent is editing this file"
-            />
+            <>
+              <span
+                className="h-1.5 w-1.5 shrink-0 rounded-full bg-kumo-success"
+                title="Agent is editing this file"
+                aria-hidden="true"
+              />
+              <span className="sr-only">(being edited)</span>
+            </>
           )}
         </button>
       ) : (
