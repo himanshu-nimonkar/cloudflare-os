@@ -354,7 +354,7 @@ function FormatRow({
                       the Outputs page, and that shouldn't be discovered there. */}
                   <figure className="hidden shrink-0 flex-col items-center gap-1.5 sm:flex">
                     <FormatPreview output={format.output} width={112} />
-                    <figcaption className="text-[10px] uppercase tracking-[0.06em] text-kumo-inactive">
+                    <figcaption className="text-[11px] uppercase tracking-[0.06em] text-kumo-inactive">
                       On Outputs
                     </figcaption>
                   </figure>
@@ -451,7 +451,7 @@ function Fieldset({
 function Badge({ children, tone = 'neutral' }: { children: React.ReactNode; tone?: 'neutral' | 'warn' }) {
   return (
     <span
-      className={`shrink-0 rounded-full px-1.5 py-0.5 text-[10px] font-medium leading-none ${
+      className={`shrink-0 rounded-full px-1.5 py-0.5 text-[11px] font-medium leading-none ${
         tone === 'warn' ? 'bg-kumo-danger/10 text-kumo-danger' : 'bg-kumo-fill text-kumo-subtle'
       }`}
     >

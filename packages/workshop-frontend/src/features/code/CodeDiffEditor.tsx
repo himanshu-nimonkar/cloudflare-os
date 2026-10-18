@@ -457,7 +457,7 @@ export default function CodeDiffEditor({
             style={{ fontFamily: monoFont }}
           >
             {summary.status !== 'Modified' && (
-              <span className="text-[10px] font-medium text-kumo-subtle">{summary.status}</span>
+              <span className="text-[11px] font-medium text-kumo-subtle">{summary.status}</span>
             )}
             <span className="text-kumo-danger">-{summary.deletions}</span>
             <span className="text-kumo-success">+{summary.additions}</span>

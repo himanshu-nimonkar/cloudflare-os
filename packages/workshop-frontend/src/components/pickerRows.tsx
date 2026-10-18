@@ -18,7 +18,7 @@ export const PICKER_EMPTY =
 export const KeyHint = ({ keyName }: { keyName: string }) => (
   <kbd
     aria-hidden="true"
-    className="flex-shrink-0 rounded border border-kumo-line bg-kumo-base px-1 py-px font-sans text-[10px] font-medium leading-4 tracking-[0.02em] text-kumo-subtle"
+    className="flex-shrink-0 rounded border border-kumo-line bg-kumo-base px-1 py-px font-sans text-[11px] font-medium leading-4 tracking-[0.02em] text-kumo-subtle"
   >
     {keyName}
   </kbd>
