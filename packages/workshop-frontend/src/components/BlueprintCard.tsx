@@ -90,7 +90,7 @@ export function BindingBadge({
     icon = <Lightning size={11} />;
   } else {
     icon = (
-      <span className="text-[10px] font-semibold leading-none">
+      <span className="text-[11px] font-semibold leading-none">
         {badge.label[0]}
       </span>
     );

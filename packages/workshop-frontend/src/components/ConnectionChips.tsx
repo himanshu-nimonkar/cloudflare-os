@@ -63,7 +63,7 @@ export default function ConnectionChips() {
               {LogoComponent ? (
                 <LogoComponent size={12} />
               ) : (
-                <span className="text-[9px] font-bold text-kumo-strong">
+                <span className="text-[11px] font-bold text-kumo-strong">
                   {account.name[0]}
                 </span>
               )}
