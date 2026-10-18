@@ -68,6 +68,8 @@ export interface ResourcePickerProps {
   maxHeight?: number
   style?: React.CSSProperties
   activeIndex?: number
+  /** Id prefix for the listbox and its options, so the caller's input can name the active option. */
+  listboxId?: string
   onItems?: (items: SelectableItem[]) => void
   activateRef?: MutableRefObject<((index: number) => void) | null>
 }
@@ -96,7 +98,7 @@ function missingResourceGrants(account: AccountDescription, resource: SupportedR
 
 export default function ResourcePicker({
   authenticatedApi, searchText, onSelectAccount, onRefine, onReadyChange, compact,
-  maxHeight: maxHeightOverride, style, activeIndex, onItems, activateRef,
+  maxHeight: maxHeightOverride, style, activeIndex, listboxId, onItems, activateRef,
 }: ResourcePickerProps) {
   const toasts = useKumoToastManager()
 
@@ -449,9 +451,24 @@ export default function ResourcePicker({
   // composer sits mid-page, and the panel grows upward.
   const maxHeight = Math.min(maxHeightOverride ?? Infinity, compact ? 220 : 400)
 
+  // Only a list that has options is a listbox; an empty or loading panel is just text.
+  const isListbox = ready && matchedResources.length > 0
+
+  const optionProps = (index: number, selected: boolean) => ({
+    role: 'option' as const,
+    'aria-selected': selected,
+    id: listboxId ? `${listboxId}-option-${index}` : undefined,
+  })
+
   return (
     <div style={style}>
-      <div className="overflow-y-auto" style={{ maxHeight }}>
+      <div
+        className="overflow-y-auto"
+        style={{ maxHeight }}
+        id={listboxId}
+        role={isListbox ? 'listbox' : undefined}
+        aria-label={isListbox ? 'Matching resources' : undefined}
+      >
         {!ready ? (
           <p className={PICKER_EMPTY}>Loading connections…</p>
         ) : matchedResources.length === 0 ? (
@@ -466,6 +483,7 @@ export default function ResourcePicker({
               return (
                 <div
                   key={`${vendor.id}-${resource.urlPattern}`}
+                  {...optionProps(itemIdx - 1, isActive)}
                   onClick={() => refine(suffix, replaceSearch)}
                   className={`${PICKER_ROW} ${i > 0 ? 'border-t border-kumo-line' : ''} ${isActive ? PICKER_ROW_ACTIVE : ''}`}
                 >
@@ -530,6 +548,7 @@ export default function ResourcePicker({
                   return (
                     <div
                       key={account.id}
+                      {...optionProps(itemIdx - 1, isActive)}
                       onClick={() => {
                         if (unfilledPlaceholder) return
                         if (needsAccess) {
@@ -596,6 +615,7 @@ export default function ResourcePicker({
                   itemIdx++
                   return (
                   <div
+                    {...optionProps(itemIdx - 1, isActive)}
                     onClick={() => !connectingVendor && handleConnectNew(vendor.id, resource.grantable ? [resource.urlPattern] : undefined)}
                     className={`${PICKER_ROW} ${isActive ? PICKER_ROW_ACTIVE : ''}`}
                     style={{
