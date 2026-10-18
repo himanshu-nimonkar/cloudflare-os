@@ -4,6 +4,7 @@ import {
   useRef,
   useMemo,
   useCallback,
+  useId,
   type Dispatch,
   type ReactNode,
   type SetStateAction,
@@ -219,6 +220,7 @@ export const ChatComposer = ({
   // each with the close of the manager that added it (useKumoToastManager is new every render).
   const configureToastsRef = useRef(new Map<string, () => void>());
   const [overlayIndex, setOverlayIndex] = useState(0);
+  const urlPickerId = useId();
   const overlayItemsRef = useRef<SelectableItem[]>([]);
   const overlayActivateRef = useRef<((index: number) => void) | null>(null);
   // Once the user moves the overlay's selection, the default stops applying.
@@ -759,6 +761,7 @@ export const ChatComposer = ({
                 onDismiss={dismissUrl}
                 lineOffset={urlLineOffset}
                 activeIndex={overlayIndex}
+                listboxId={urlPickerId}
                 onItems={handleOverlayItems}
                 activateRef={overlayActivateRef}
               />
@@ -773,9 +776,14 @@ export const ChatComposer = ({
               value={inputValue}
               role="combobox"
               aria-autocomplete="list"
-              aria-expanded={slashCommandPicker.open}
-              aria-controls={slashCommandPicker.open ? slashCommandPicker.listboxId : undefined}
-              aria-activedescendant={slashCommandPicker.activeDescendant}
+              aria-expanded={slashCommandPicker.open || Boolean(activeUrl)}
+              aria-controls={
+                slashCommandPicker.open ? slashCommandPicker.listboxId : activeUrl ? urlPickerId : undefined
+              }
+              aria-activedescendant={
+                slashCommandPicker.activeDescendant ??
+                (activeUrl ? `${urlPickerId}-option-${overlayIndex}` : undefined)
+              }
               onChange={(e) => {
                 handleInputChange(e.target.value, e.target.selectionStart ?? 0);
                 syncPickerCaret(e.target.selectionStart ?? 0);
